@@ -1,0 +1,9 @@
+[submodule "docker"]
+	path = docker
+	url = https://gitlab.cern.ch/atlas-nextgen-wp21/docker-builder.git
+[submodule "apptainer"]
+	path = apptainer
+	url = https://gitlab.cern.ch/atlas-nextgen-wp21/apptainer-wrapper.git
+[submodule "wp21_train"]
+	path = wp21_train
+	url = https://gitlab.cern.ch/atlas-nextgen-wp21/wp21_training_framework.git
