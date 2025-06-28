@@ -1,0 +1,21 @@
+# config.yml
+
+exports:
+  PROJECT_NAME: "jetSeeding" #Name of design
+  PLATFORM: "apptainer" #Docker or Apptainer
+  SAMPLE_PATH: "GlobalSamples/merges/" #Path to samples
+  SAMPLE_NAME: "merged_HHbbbb_10000_train_0.root" #Name of train sample
+  PROJECT_FOLDER: "/home/ixiotidi/Development/" #Folder to be copied/access in container
+  PROJECT_NAME: "FastML4Jets" #Name of specific project
+  TEST_PACKAGE: "wp21_training_framework" #[Optional] Testing software alogn (wp21_train)
+  KRB_ACCOUNT: "ngtwp21" #Not in used currently
+  KRB_PASSWORD: "/home/ixiotidi/Development/docker-builder/password.pass" #Password for kerberos ticket
+  KUBEFLOW_FILE: "yes" #Generates or not a kubeflow file for running in NGT WP1.1 cluster
+  
+metadata:
+  DEV_NAME: "Ioannis Xiotidis" 
+  DEV_EMAIL: "ioannis.xiotdis@cern.ch"
+  CREATED: "2025-06-28"
+  TIME_ZONE: "UTC+1"
+  HOSTNAME: "atlas-ngt-wp21"
+  SHELL: "bash"
