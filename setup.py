@@ -13,7 +13,7 @@ print("#####################################")
 print("### Welcome to WP2.1 ML framework ###")
 print("#####################################")
 
-var = ["ENV_NAME","CONT_NAME","CONT_LOC","SAMPLE_PATH","SAMPLE_NAME","SAMPLE_EOS","PROJECT_FOLDER","PROJECT_NAME","TEST_FOLDER","TEST_PACKAGE","KRB_ACCOUNT","KRB_PASSWORD","KUBEFLOW_FILE"]
+var = ["ENV_NAME","CONT_NAME","CONT_LOC","SAMPLE_PATH","SAMPLE_NAME","SAMPLE_EOS","PROJECT_FOLDER","PROJECT_NAME","TEST_FOLDER","TEST_PACKAGE","KRB_ACCOUNT","KRB_PASSWORD","KUBEFLOW_FILE","JUPYTER_PORT"]
 
 var_desc = ["Name of the current working environment",
             "Name of the container [hls4ml, conifer, custom]",
@@ -27,7 +27,13 @@ var_desc = ["Name of the current working environment",
             "[Optional]: Name of test package (ie. WP21_Train)",
             "Kerberos account username for auto-copy of sample in docker image",
             "[Optional]: Path to password file (NOTE: Don't copy that into git)",
-            "Generate kubeflow for WP1.1 infrastructure [yes/no]"]
+            "Generate kubeflow for WP1.1 infrastructure [yes/no]",
+            "Port for Jupyter Notebook to run"]
+
+alias_summary = ["drun: Runs docker container",
+                 "dshell: Runs docker container in interactive mode",
+                 "arun: Runs apptainer wrapper of docker container",
+                 "ashell: Runs apptainer wrapper of docker container"]
 
 def load_yaml_config(path):
     with open(path, 'r') as f:
@@ -123,17 +129,31 @@ def alias_commands():
     if str(os.environ.get('SAMPLE_EOS')) == "no":
         FILE = ' -v $SAMPLE_PATH$SAMPLE_NAME:/workspace/samples'
 
-    CONT = ' $CONT_NAME:latest'
+    CONT  = ' $CONT_NAME:latest'
+    ACONT = ' $CONT_NAME.sif'
     if str(os.environ.get("CONT_LOC")) == "harbor":
         CONT = ' registry.cern.ch/atlas-ngt-wp21/$CONT_NAME:latest'
     elif str(os.environ.get("CONT_LOC")) == "cvmfs":
         CONT = ' /cvmfs/unpacked.cern.ch/$CONT_NAME:latest'
+
+    GPU  = ""
+    AGPU = ""
+    EBIND = ""
+    if has_gpu():
+        GPU   = " --gpus all"
+        AGPU  = " --nv"
+        EBIND = " --bind /usr/local/cuda:/usr/local/cuda,/usr/lib:/usr/lib"
         
     #Docker alias
-    drun = 'alias drun="'+dockerBase+' --rm -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrtes/password.pass:ro' + FILE + CONT + '"'
-    srun = 'alias srun="'+dockerBase+' --rm -it -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + FILE + CONT + '"'
+    drun = 'alias drun="'+dockerBase+' --rm' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrtes/password.pass:ro' + FILE + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
+    dshell = 'alias dshell="'+dockerBase+' --rm -it' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + FILE + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
 
-    return [drun, srun]
+    #Apptainer alias
+    arun = 'alias arun=' + appBase + ' run' + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + FILE + ACONT + '"'
+
+    ashell = 'alias ashell="' + appBase + ' shell' + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + FILE + ACONT + '"'
+
+    return [drun, dshell, arun, ashell]
     
 def make_conf_script(export_vars):
     f = open('.run_conf.sh','w')
@@ -152,7 +172,23 @@ def make_conf_script(export_vars):
     for i_cmd in aliasCmds:
         f.write(i_cmd+'\n')
     
-    f.close()        
+    f.close()
+
+def make_cleanup_script(export_vars):
+    f = open('.clean_up.sh','w')
+    f.write('#!/bin/bash\n')
+    f.write('\n')
+    f.write('#Auto-generated script by WP2.1 ML framework\n')
+    f.write('\n')
+    f.write('\n')
+    for key, value in export_vars['exports'].items():
+        f.write(f'export {key}=""\n')
+    f.write('\n')
+    f.write('unalias arun\n')
+    f.write('unalias ashell\n')
+    f.write('unalias drun\n')
+    f.write('unalias dshell\n')
+    f.close()
     
 def main():
     parser = argparse.ArgumentParser(description="Setup environment for WP2.1 ML framework")
@@ -181,6 +217,7 @@ def main():
         dump_config_yaml(export_vars, filename)
 
     make_conf_script(export_vars)
+    make_cleanup_script(export_vars)
         
 if __name__ == "__main__":
     main()

@@ -14,6 +14,7 @@ exports:
   KRB_ACCOUNT: "ngtwp21" #Not in used currently
   KRB_PASSWORD: "/home/ixiotidi/Development/docker-builder/password.pass" #Password for kerberos ticket
   KUBEFLOW_FILE: "yes" #Generates or not a kubeflow file for running in NGT WP1.1 cluster
+  JUPYTER_PORT: 8888 #Jupyter notebook port
   
 metadata:
   DEV_USER: "ixiotidi" 
