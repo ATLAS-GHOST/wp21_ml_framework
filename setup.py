@@ -108,11 +108,21 @@ def dump_config_yaml(exports, filename):
 def has_gpu():
     if not shutil.which('nvidia-smi'):
         return False
+
     try:
         output = subprocess.check_output(['nvidia-smi','-L'], stderr=subprocess.DEVNULL)
         return bool(output.strip())
     except subprocess.CalledProcessError:
         return False
+
+    try:
+        output = subprocess.check_output(['docker','info'], text=True)
+        if 'nvidia' not in output:
+            return False
+    except Exception:
+        return False
+
+    return True
 
 def check_slash(path):
     return path if path.endswith('/') else path + '/'
@@ -123,6 +133,7 @@ def alias_commands():
 
     PROJECT  = '$PROJECT_FOLDER$PROJECT_NAME'
 
+    ACCOUNT  = ' -e KRB_ACCOUNT=$KRB_ACCOUNT'
     PASSWORD = '$KRB_PASSWORD'
 
     FILE = ' -e SAMPLE_PATH=$SAMPLE_PATH -e SAMPLE_NAME=$SAMPLE_NAME'
@@ -135,6 +146,8 @@ def alias_commands():
         CONT = ' registry.cern.ch/atlas-ngt-wp21/$CONT_NAME:latest'
     elif 'cvmfs' in str(os.environ.get("CONT_LOC")):
         CONT = ' /cvmfs/unpacked.cern.ch/$CONT_NAME:latest'
+        
+    print(f"[INFO] Image path: {os.environ.get('CONT_NAME')}")
 
     GPU   = ""
     AGPU  = ""
@@ -147,12 +160,11 @@ def alias_commands():
         DBIND = " -v /usr/local/cuda:/usr/local/cuda -v /usr/lib:/usr/lib"
         
     #Docker alias
-    drun = 'alias drun="'+dockerBase+' --rm' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrtes/password.pass:ro' + DBIND + FILE + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
-    dshell = 'alias dshell="'+dockerBase+' --rm -it' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + DBIND + FILE + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
+    drun   = 'alias drun="'  +dockerBase+' --rm'     + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + DBIND + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
+    dshell = 'alias dshell="'+dockerBase+' --rm -it' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + DBIND + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
 
     #Apptainer alias
-    arun = 'alias arun="' + appBase + ' run' + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + FILE + ACONT + '"'
-
+    arun   = 'alias arun="'   + appBase + ' run'   + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + FILE + ACONT + '"'
     ashell = 'alias ashell="' + appBase + ' shell' + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + FILE + ACONT + '"'
 
     return [drun, dshell, arun, ashell]
