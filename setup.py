@@ -182,7 +182,7 @@ def make_cleanup_script(export_vars):
     f.write('\n')
     f.write('\n')
     for key, value in export_vars['exports'].items():
-        f.write(f'export {key}=""\n')
+        f.write(f'unset {key}\n')
     f.write('\n')
     f.write('unalias arun\n')
     f.write('unalias ashell\n')
