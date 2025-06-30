@@ -4,7 +4,7 @@ exports:
   ENV_NAME: "jetSeeding" #Name of design
   CONT_NAME: "hls4ml" #Name of the container
   CONT_LOC: "harbor" #Container location [harbor, cvmfs, custom]
-  SAMPLE_PATH: "GlobalSamples/merges/" #Path to samples
+  SAMPLE_PATH: "GlobalSamples/merged/" #Path to samples
   SAMPLE_NAME: "merged_HHbbbb_10000_train_0.root" #Name of train sample
   SAMPLE_EOS: "yes" #If sample is in eos
   PROJECT_FOLDER: "/home/ixiotidi/Development/" #Folder to be copied/access in container

@@ -31,7 +31,10 @@ In order to develop within the WP2.1 framework please use the following instruct
 ```
 git clone <ml-framework-url>.git
 git submodule update --init --recursive
-source setup.sh #Produces all the paths for developments in additio to aliases for executing the containers
+source setup.sh <config-file>.yml #Produces all the paths for developments in additio to aliases for executing the containers
+
+##Optional cleanup
+source setup.sh "" cleanup #Will unset all the environment variables
 
 ```
 

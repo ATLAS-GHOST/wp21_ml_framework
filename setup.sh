@@ -30,9 +30,11 @@ fi
 
 if [[ -n "$CONFIG_FILE" ]]; then
     echo "Running setup.py with config: $CONFIG_FILE"
-    python3 setup.py --config "$CONFIG_FILE"
+    python setup.py --config "$CONFIG_FILE"
+    source .run_conf.sh
 else
     echo "Running setup.py with no config"
-    python3 setup.py
+    python setup.py
+    source .run_conf.sh
 fi
 

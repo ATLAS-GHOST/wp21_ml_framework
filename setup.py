@@ -20,7 +20,7 @@ var_desc = ["Name of the current working environment",
             "Container location [harbor, cvmfs, custom]",
             "Path where the working sample exist",
             "Name of the working sample",
-            "If sample exist in /eos (for auto-copy) [yes/no]"
+            "If sample exist in /eos (for auto-copy) [yes/no]",
             "Path where the ML model files exist",
             "Name of the ML model folder",
             "[Optional]: Path to test package (ie. WP21_Train)",
@@ -136,8 +136,8 @@ def alias_commands():
     elif str(os.environ.get("CONT_LOC")) == "cvmfs":
         CONT = ' /cvmfs/unpacked.cern.ch/$CONT_NAME:latest'
 
-    GPU  = ""
-    AGPU = ""
+    GPU   = ""
+    AGPU  = ""
     EBIND = ""
     if has_gpu():
         GPU   = " --gpus all"
@@ -149,7 +149,7 @@ def alias_commands():
     dshell = 'alias dshell="'+dockerBase+' --rm -it' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + FILE + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
 
     #Apptainer alias
-    arun = 'alias arun=' + appBase + ' run' + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + FILE + ACONT + '"'
+    arun = 'alias arun="' + appBase + ' run' + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + FILE + ACONT + '"'
 
     ashell = 'alias ashell="' + appBase + ' shell' + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + FILE + ACONT + '"'
 
@@ -207,7 +207,7 @@ def main():
             for k, v in export_vars.items():
                 print(f"   {k} = {v}")
         else:
-            export_vars = prompt_user_for_env()            
+            export_vars = prompt_user_for_env()
         def_date = date.today().strftime("%Y-%m-%d")
         def_name = export_vars["ENV_NAME"]
         def_file = f"{def_name}-{def_date}.yml"        
@@ -215,6 +215,9 @@ def main():
         if not filename:
             filename = def_file                
         dump_config_yaml(export_vars, filename)
+        tvar                   = export_vars
+        export_vars            = {}
+        export_vars['exports'] = tvar
 
     make_conf_script(export_vars)
     make_cleanup_script(export_vars)
