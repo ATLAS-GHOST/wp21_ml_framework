@@ -23,7 +23,7 @@ var_desc = ["Name of the current working environment",
             "If sample exist in /eos (for auto-copy) [yes/no]",
             "Path where the ML model files exist",
             "Name of the ML model folder",
-            "[Optional]: Path to test package (ie. WP21_Train)",
+            "[Optional]: Path to test package if custom version (ie. WP21_Train)",
             "[Optional]: Name of test package (ie. WP21_Train)",
             "Kerberos account username for auto-copy of sample in docker image",
             "[Optional]: Path to password file (NOTE: Don't copy that into git)",
@@ -137,7 +137,7 @@ def alias_commands(export_vars):
     PASSWORD = '$KRB_PASSWORD'
 
     FILE = ' -e SAMPLE_PATH=$SAMPLE_PATH -e SAMPLE_NAME=$SAMPLE_NAME'
-    if "no" in export_vars['exports']['SAMPLE_OS']: #str(os.environ.get('SAMPLE_EOS')):
+    if "no" in export_vars['exports']['SAMPLE_EOS']: #str(os.environ.get('SAMPLE_EOS')):
         FILE = ' -v $SAMPLE_PATH$SAMPLE_NAME:/workspace/samples/$SAMPLE_NAME:ro'
 
     print(f"[INFO] Sample command: {os.environ.get('SAMPLE_EOS')}")
