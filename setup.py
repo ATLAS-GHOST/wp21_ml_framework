@@ -131,9 +131,9 @@ def alias_commands():
 
     CONT  = ' $CONT_NAME:latest'
     ACONT = ' $CONT_NAME.sif'
-    if str(os.environ.get("CONT_LOC")) == "harbor":
+    if 'harbor' in str(os.environ.get("CONT_LOC")):
         CONT = ' registry.cern.ch/atlas-ngt-wp21/$CONT_NAME:latest'
-    elif str(os.environ.get("CONT_LOC")) == "cvmfs":
+    elif 'cvmfs' in str(os.environ.get("CONT_LOC")):
         CONT = ' /cvmfs/unpacked.cern.ch/$CONT_NAME:latest'
 
     GPU   = ""
