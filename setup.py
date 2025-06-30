@@ -139,14 +139,16 @@ def alias_commands():
     GPU   = ""
     AGPU  = ""
     EBIND = ""
+    DBIND = ""
     if has_gpu():
         GPU   = " --gpus all"
         AGPU  = " --nv"
         EBIND = " --bind /usr/local/cuda:/usr/local/cuda,/usr/lib:/usr/lib"
+        DBIND = " -v /usr/local/cuda:/usr/local/cuda -v /usr/lib:/usr/lib"
         
     #Docker alias
-    drun = 'alias drun="'+dockerBase+' --rm' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrtes/password.pass:ro' + FILE + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
-    dshell = 'alias dshell="'+dockerBase+' --rm -it' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + FILE + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
+    drun = 'alias drun="'+dockerBase+' --rm' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrtes/password.pass:ro' + DBIND + FILE + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
+    dshell = 'alias dshell="'+dockerBase+' --rm -it' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + DBIND + FILE + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
 
     #Apptainer alias
     arun = 'alias arun="' + appBase + ' run' + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + FILE + ACONT + '"'
