@@ -137,8 +137,9 @@ def alias_commands():
     PASSWORD = '$KRB_PASSWORD'
 
     FILE = ' -e SAMPLE_PATH=$SAMPLE_PATH -e SAMPLE_NAME=$SAMPLE_NAME'
-    if str(os.environ.get('SAMPLE_EOS')) == "no":
-        FILE = ' -v $SAMPLE_PATH$SAMPLE_NAME:/workspace/samples'
+    if "no" in str(os.environ.get('SAMPLE_EOS')):
+        FILE = ' -v $SAMPLE_PATH$SAMPLE_NAME:/workspace/samples/$SAMPLE_NAME:ro'
+    print(f"[INFO] Sample command: {os.environ.get('SAMPLE_EOS')}")
 
     CONT  = ' $CONT_NAME:latest'
     ACONT = ' $CONT_NAME.sif'
