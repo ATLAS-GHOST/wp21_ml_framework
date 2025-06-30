@@ -127,28 +127,35 @@ def has_gpu():
 def check_slash(path):
     return path if path.endswith('/') else path + '/'
     
-def alias_commands():
+def alias_commands(export_vars):
     dockerBase = 'docker run'
     appBase    = 'apptainer'
-
+    
     PROJECT  = '$PROJECT_FOLDER$PROJECT_NAME'
 
     ACCOUNT  = ' -e KRB_ACCOUNT=$KRB_ACCOUNT'
     PASSWORD = '$KRB_PASSWORD'
 
     FILE = ' -e SAMPLE_PATH=$SAMPLE_PATH -e SAMPLE_NAME=$SAMPLE_NAME'
-    if "no" in str(os.environ.get('SAMPLE_EOS')):
+    if "no" in export_vars['exports']['SAMPLE_OS']: #str(os.environ.get('SAMPLE_EOS')):
         FILE = ' -v $SAMPLE_PATH$SAMPLE_NAME:/workspace/samples/$SAMPLE_NAME:ro'
+
     print(f"[INFO] Sample command: {os.environ.get('SAMPLE_EOS')}")
 
     CONT  = ' $CONT_NAME:latest'
     ACONT = ' $CONT_NAME.sif'
-    if 'harbor' in str(os.environ.get("CONT_LOC")):
+    if 'harbor' in export_vars['exports']['CONT_LOC']: #str(os.environ.get("CONT_LOC")):
         CONT = ' registry.cern.ch/atlas-ngt-wp21/$CONT_NAME:latest'
-    elif 'cvmfs' in str(os.environ.get("CONT_LOC")):
+    elif 'cvmfs' in export_vars['exports']['CONT_LOC']: #str(os.environ.get("CONT_LOC")):
         CONT = ' /cvmfs/unpacked.cern.ch/$CONT_NAME:latest'
         
-    print(f"[INFO] Image path: {os.environ.get('CONT_NAME')}")
+    print(f"[INFO] Image path: {export_vars['exports']['CONT_LOC']}")
+
+    ATEST = ''
+    DTEST = ''
+    if export_vars['exports']['TEST_FOLDER'] and export_vars['exports']['TEST_PACKAGE']:
+        DTEST = ' -v $TEST_FOLDER$TEST_PACKAGE:/workspace/testDir'
+        ATEST = ' --bind $TEST_FOLDER$TEST_PACKAGE:/workspace/testDir'
 
     GPU   = ""
     AGPU  = ""
@@ -161,12 +168,12 @@ def alias_commands():
         DBIND = " -v /usr/local/cuda:/usr/local/cuda -v /usr/lib:/usr/lib"
         
     #Docker alias
-    drun   = 'alias drun="'  +dockerBase+' --rm'     + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + DBIND + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
-    dshell = 'alias dshell="'+dockerBase+' --rm -it' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + DBIND + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
+    drun   = 'alias drun="'  +dockerBase+' --rm'     + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
+    dshell = 'alias dshell="'+dockerBase+' --rm -it' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
 
     #Apptainer alias
-    arun   = 'alias arun="'   + appBase + ' run'   + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + FILE + ACONT + '"'
-    ashell = 'alias ashell="' + appBase + ' shell' + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + FILE + ACONT + '"'
+    arun   = 'alias arun="'   + appBase + ' run'   + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + FILE + ACONT + '"'
+    ashell = 'alias ashell="' + appBase + ' shell' + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + FILE + ACONT + '"'
 
     return [drun, dshell, arun, ashell]
     
@@ -183,7 +190,7 @@ def make_conf_script(export_vars):
         f.write(f'export {key}={value}\n')
     f.write('\n')
     f.write('#Alias for executing container selection (docker and apptainer)\n')
-    aliasCmds = alias_commands()
+    aliasCmds = alias_commands(export_vars)
     for i_cmd in aliasCmds:
         f.write(i_cmd+'\n')
     
