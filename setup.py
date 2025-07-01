@@ -159,21 +159,23 @@ def alias_commands(export_vars):
 
     GPU   = ""
     AGPU  = ""
-    EBIND = ""
-    DBIND = ""
+    EBIND = " --bind ./scripts:/workspace/scripts"
+    DBIND = " -v ./scripts:/workspace/scripts"
     if has_gpu():
         GPU   = " --gpus all"
         AGPU  = " --nv"
-        EBIND = " --bind /usr/local/cuda:/usr/local/cuda,/usr/lib:/usr/lib"
-        DBIND = " -v /usr/local/cuda:/usr/local/cuda -v /usr/lib:/usr/lib"
+        EBIND = "$EBIND --bind /usr/local/cuda:/usr/local/cuda,/usr/lib:/usr/lib"
+        DBIND = "$DBIND -v /usr/local/cuda:/usr/local/cuda -v /usr/lib:/usr/lib"
+
+    ENV = " --env JUPYTER_PORT=$JUPYTER_PORT "
         
     #Docker alias
-    drun   = 'alias drun="'  +dockerBase+' --rm'     + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
-    dshell = 'alias dshell="'+dockerBase+' --rm -it' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
+    drun   = 'alias drun="'  +dockerBase+' --rm'     + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + ENV + CONT + '"'
+    dshell = 'alias dshell="'+dockerBase+' --rm -it' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + ENV + CONT + '"'
 
     #Apptainer alias
-    arun   = 'alias arun="'   + appBase + ' run'   + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + FILE + ACONT + '"'
-    ashell = 'alias ashell="' + appBase + ' shell' + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + FILE + ACONT + '"'
+    arun   = 'alias arun="'   + appBase + ' run'   + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + FILE + ENV + ACONT + '"'
+    ashell = 'alias ashell="' + appBase + ' shell' + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + FILE + ENV + ACONT + '"'
 
     return [drun, dshell, arun, ashell]
     
