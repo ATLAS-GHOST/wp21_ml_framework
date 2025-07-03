@@ -138,9 +138,9 @@ def alias_commands(export_vars):
 
     FILE  = ' -e SAMPLE_PATH=$SAMPLE_PATH -e SAMPLE_NAME=$SAMPLE_NAME'
     AFILE = ' --env SAMPLE_PATH=$SAMPLE_PATH --env SAMPLE_NAME=$SAMPLE_NAME'
-    if "no" in export_vars['exports']['SAMPLE_EOS']: #str(os.environ.get('SAMPLE_EOS')):
-        FILE = ' -v $SAMPLE_PATH$SAMPLE_NAME:/workspace/samples/$SAMPLE_NAME:ro'
-        FILE = ' --bind $SAMPLE_PATH$SAMPLE_NAME:/workspace/samples/$SAMPLE_NAME:ro'
+    if "no" in export_vars['exports']['SAMPLE_EOS']:
+        FILE  = ' -v $SAMPLE_PATH$SAMPLE_NAME:/workspace/samples/$SAMPLE_NAME:ro'
+        AFILE = ' --bind $SAMPLE_PATH$SAMPLE_NAME:/workspace/samples/$SAMPLE_NAME:ro'
 
     print(f"[INFO] Sample command: {os.environ.get('SAMPLE_EOS')}")
 
