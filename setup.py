@@ -172,10 +172,11 @@ def alias_commands(export_vars):
     dshell = 'alias dshell="'+dockerBase+' --rm -it' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
 
     #Apptainer alias
-    arun   = 'alias arun="'   + appBase + ' run'   + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + FILE + ACONT + '"'
-    ashell = 'alias ashell="' + appBase + ' shell' + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + FILE + ACONT + '"'
+    abuild = 'abuild(){\necho "[INFO] Dependence to git-submodule within the wp21_ml_framework folder" \napptainer build -F $CONT_NAME.sif apptainer/def_file/apptainer.def\n}'
+    arun   = 'alias arun="'   + appBase + ' run --no-home --contain --write-tmpfs'   + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + FILE + ACONT + '"'
+    ashell = 'alias ashell="' + appBase + ' shell --no-home --contain --write-tmpfs' + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + FILE + ACONT + '"'
 
-    return [drun, dshell, arun, ashell]
+    return [drun, dshell, arun, ashell, abuild]
     
 def make_conf_script(export_vars):
     f = open('.run_conf.sh','w')
