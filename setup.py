@@ -178,7 +178,7 @@ def alias_commands(export_vars):
     dshell = 'alias dshell="'+dockerBase+' --rm -it' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
 
     #Apptainer alias
-    abuild = 'abuild(){\necho "[INFO] Dependence to git-submodule within the wp21_ml_framework folder" \napptainer build -F $CONT_NAME.sif $FRAMEWORK_DIR/apptainer/def_file/apptainer.def\n}'
+    abuild = 'abuild(){\necho "[INFO] Dependence to git-submodule within the wp21_ml_framework folder" \napptainer build -F --build-arg CONT_NAME=$CONT_NAME $CONT_NAME.sif $FRAMEWORK_DIR/apptainer/def_file/apptainer.def\n}'
     arun   = 'alias arun="'   + appBase + ' run --no-home --contain --writable-tmpfs'   + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + AFILE + " --env JPORT=$JUPYTER_PORT" + ACONT + '"'
     ashell = 'alias ashell="' + appBase + ' shell --no-home --contain --writable-tmpfs' + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + AFILE + ACONT + '"'
 
