@@ -55,6 +55,7 @@ source setup.sh "" cleanup #Will unset all the environment variables
 /workspace/samples #Folder with the data sample used, either mounted or copied from /eos
 /workspace/workDir #Folder where the ML model files exists and all the development happens
 (Optional) /workspace/testDir #Directory with mounted test tools that can be used by the user
+```
 
 ###Container environment
 
