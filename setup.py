@@ -136,9 +136,11 @@ def alias_commands(export_vars):
     ACCOUNT  = ' -e KRB_ACCOUNT=$KRB_ACCOUNT'
     PASSWORD = '$KRB_PASSWORD'
 
-    FILE = ' -e SAMPLE_PATH=$SAMPLE_PATH -e SAMPLE_NAME=$SAMPLE_NAME'
+    FILE  = ' -e SAMPLE_PATH=$SAMPLE_PATH -e SAMPLE_NAME=$SAMPLE_NAME'
+    AFILE = ' --env SAMPLE_PATH=$SAMPLE_PATH --env SAMPLE_NAME=$SAMPLE_NAME'
     if "no" in export_vars['exports']['SAMPLE_EOS']: #str(os.environ.get('SAMPLE_EOS')):
         FILE = ' -v $SAMPLE_PATH$SAMPLE_NAME:/workspace/samples/$SAMPLE_NAME:ro'
+        FILE = ' --bind $SAMPLE_PATH$SAMPLE_NAME:/workspace/samples/$SAMPLE_NAME:ro'
 
     print(f"[INFO] Sample command: {os.environ.get('SAMPLE_EOS')}")
 
@@ -177,8 +179,8 @@ def alias_commands(export_vars):
 
     #Apptainer alias
     abuild = 'abuild(){\necho "[INFO] Dependence to git-submodule within the wp21_ml_framework folder" \napptainer build -F $CONT_NAME.sif $FRAMEWORK_DIR/apptainer/def_file/apptainer.def\n}'
-    arun   = 'alias arun="'   + appBase + ' run --no-home --contain --writable-tmpfs'   + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + FILE + ACONT + '"'
-    ashell = 'alias ashell="' + appBase + ' shell --no-home --contain --writable-tmpfs' + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + FILE + ACONT + '"'
+    arun   = 'alias arun="'   + appBase + ' run --no-home --contain --writable-tmpfs'   + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + AFILE + ACONT + '"'
+    ashell = 'alias ashell="' + appBase + ' shell --no-home --contain --writable-tmpfs' + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + AFILE + ACONT + '"'
 
     return [drun, dshell, arun, ashell, abuild]
     
