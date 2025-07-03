@@ -148,6 +148,10 @@ def alias_commands(export_vars):
         CONT = ' registry.cern.ch/atlas-ngt-wp21/$CONT_NAME:latest'
     elif 'cvmfs' in export_vars['exports']['CONT_LOC']: #str(os.environ.get("CONT_LOC")):
         CONT = ' /cvmfs/unpacked.cern.ch/$CONT_NAME:latest'
+
+    if os.path.ismount('/eos'):
+        print(f"[INFO] EOS is mounted in host machine hence apptainers can be fetched")
+        ACONT = ' /eos/project/a/atlas-ngt-wp21/apptainer_containers/$CONT_NAME.sif'
         
     print(f"[INFO] Image path: {export_vars['exports']['CONT_LOC']}")
 
@@ -172,9 +176,9 @@ def alias_commands(export_vars):
     dshell = 'alias dshell="'+dockerBase+' --rm -it' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
 
     #Apptainer alias
-    abuild = 'abuild(){\necho "[INFO] Dependence to git-submodule within the wp21_ml_framework folder" \napptainer build -F $CONT_NAME.sif apptainer/def_file/apptainer.def\n}'
-    arun   = 'alias arun="'   + appBase + ' run --no-home --contain --write-tmpfs'   + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + FILE + ACONT + '"'
-    ashell = 'alias ashell="' + appBase + ' shell --no-home --contain --write-tmpfs' + AGPU + '--bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + FILE + ACONT + '"'
+    abuild = 'abuild(){\necho "[INFO] Dependence to git-submodule within the wp21_ml_framework folder" \napptainer build -F $CONT_NAME.sif $FRAMEWORK_DIR/apptainer/def_file/apptainer.def\n}'
+    arun   = 'alias arun="'   + appBase + ' run --no-home --contain --writable-tmpfs'   + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + FILE + ACONT + '"'
+    ashell = 'alias ashell="' + appBase + ' shell --no-home --contain --writable-tmpfs' + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + FILE + ACONT + '"'
 
     return [drun, dshell, arun, ashell, abuild]
     
@@ -189,6 +193,8 @@ def make_conf_script(export_vars):
     f.write('#Environment variables\n')
     for key, value in export_vars['exports'].items():
         f.write(f'export {key}={value}\n')
+    f.write('export CUR_DIR=$(pwd)\n')
+    f.write('export FRAMEWORK_DIR="$(find /home/$USER -type d -name \'wp21_ml_framework\' 2>/dev/null | head -n 1)"\n')
     f.write('\n')
     f.write('#Alias for executing container selection (docker and apptainer)\n')
     aliasCmds = alias_commands(export_vars)
@@ -206,6 +212,8 @@ def make_cleanup_script(export_vars):
     f.write('\n')
     for key, value in export_vars['exports'].items():
         f.write(f'unset {key}\n')
+    f.write('unset CUR_DIR\n')
+    f.write('unset FRAMEWORK_DIR\n')
     f.write('\n')
     f.write('unalias arun\n')
     f.write('unalias ashell\n')
