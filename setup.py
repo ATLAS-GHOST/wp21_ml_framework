@@ -179,7 +179,7 @@ def alias_commands(export_vars):
 
     #Apptainer alias
     abuild = 'abuild(){\necho "[INFO] Dependence to git-submodule within the wp21_ml_framework folder" \napptainer build -F $CONT_NAME.sif $FRAMEWORK_DIR/apptainer/def_file/apptainer.def\n}'
-    arun   = 'alias arun="'   + appBase + ' run --no-home --contain --writable-tmpfs'   + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + AFILE + ACONT + '"'
+    arun   = 'alias arun="'   + appBase + ' run --no-home --contain --writable-tmpfs'   + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + AFILE + " --env JPORT=$JUPYTER_PORT" + ACONT + '"'
     ashell = 'alias ashell="' + appBase + ' shell --no-home --contain --writable-tmpfs' + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + AFILE + ACONT + '"'
 
     return [drun, dshell, arun, ashell, abuild]
