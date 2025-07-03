@@ -63,25 +63,44 @@ source setup.sh "" cleanup #Will unset all the environment variables
 The container creates a fixed environment and detects automatically whether the host machine has an NVIDIA GPU for training purposes. After that sets some of the configuration parameters and alias for execution
 
 1. Exported variables
-   a. ENV_NAME: A user provided name for the current configuration (ie. You can provide the name of the algorithm you develop)
-   b. CONT_NAME: Select one of the containers supported by the WP2.1 developers (harbor, conifer, base)
-   c. CONT_LOC: Checks where to fetch the container from. Currently harbor and cvmfs are used but also you can use local images (use custom if custom image is going to be used)
-   d. SAMPLE_PATH: Define the path where the sample leaves (if the sample exists in the WP2.1 eos path don't write the first /)
-   e. SAMPLE_NAME: Name the sample which needs to be copied or mounted (if empty the whole directory will be taken)
-   f. SAMPLE_EOS: If [yes] selected then the /eos path for the WP2.1 project will be added automatically and the sample will be copied within the container (CAUTION: That can explode the container size when running)
-   g. PROJECT_FOLDER: Define the path towards the folder where your project exists (local path) (This folder is mounted into the container)
-   h. PROJECT_NAME: Folder name where your ML code exists (basically $PROJECT_FOLDER/$PROJECT_NAME is the mounted folder)
-   i. TEST_FOLDER: Extra space for testing tools or Vivado (optional)
-   j. TEST_NAME: Test folder name ($TEST_FOLDER/$TEST_NAME mounted if provided
-   k. KRB_ACCOUNT: Kerberos for authentication if the sample has to be copied from /eos (when sample not available to be mounted)
-   l. KRB_PASSWORD: File that contains the password for the automatic /eos authentication (if not provided the kinit will fail and then the user has to copy the file from /eos manually after launching the container)
-   m. KUBEFLOW_FILE: Currently not supported!
-   n. JUPYTER_PORT: Port in which the Jupyter Notebook within the container will execute.
+
+   a. `ENV_NAME`: A user provided name for the current configuration (ie. You can provide the name of the algorithm you develop)
+   
+   b. `CONT_NAME`: Select one of the containers supported by the WP2.1 developers (harbor, conifer, base)
+   
+   c. `CONT_LOC`: Checks where to fetch the container from. Currently harbor and cvmfs are used but also you can use local images (use custom if custom image is going to be used)
+   
+   d. `SAMPLE_PATH`: Define the path where the sample leaves (if the sample exists in the WP2.1 eos path don't write the first /)
+   
+   e. `SAMPLE_NAME`: Name the sample which needs to be copied or mounted (if empty the whole directory will be taken)
+   
+   f. `SAMPLE_EOS`: If [yes] selected then the /eos path for the WP2.1 project will be added automatically and the sample will be copied within the container (CAUTION: That can explode the container size when running)
+   
+   g. `PROJECT_FOLDER`: Define the path towards the folder where your project exists (local path) (This folder is mounted into the container)
+   
+   h. `PROJECT_NAME`: Folder name where your ML code exists (basically $PROJECT_FOLDER/$PROJECT_NAME is the mounted folder)
+   
+   i. `TEST_FOLDER`: Extra space for testing tools or Vivado (optional)
+   
+   j. `TEST_NAME`: Test folder name ($TEST_FOLDER/$TEST_NAME mounted if provided
+   
+   k. `KRB_ACCOUNT`: Kerberos for authentication if the sample has to be copied from /eos (when sample not available to be mounted)
+   
+   l. `KRB_PASSWORD`: File that contains the password for the automatic /eos authentication (if not provided the kinit will fail and then the user has to copy the file from /eos manually after launching the container)
+   
+   m. `KUBEFLOW_FILE`: Currently not supported!
+   
+   n. `JUPYTER_PORT`: Port in which the Jupyter Notebook within the container will execute.
+   
 2. Alias
-   a. drun: Executes the docker container (if the user has access to launch docker containers)
-   b. dshell: Executes the docker container in interactive mode
-   c. arun: Launches the Apptainer-Wrapper (if /eos available it looks in the /eos/project/a/atlas-ngt-wp21/apptainer_containers path)
-   d. (Developers) abuild: Uses the .def file from the apptainer submodules and builds the apptainer image locally in the current folder (assumes that the user has cloned the submodules as well)
+
+   a. `drun`: Executes the docker container (if the user has access to launch docker containers)
+   
+   b. `dshell`: Executes the docker container in interactive mode
+   
+   c. `arun`: Launches the Apptainer-Wrapper (if /eos available it looks in the /eos/project/a/atlas-ngt-wp21/apptainer_containers path)
+   
+   d. `(Developers) abuild`: Uses the .def file from the apptainer submodules and builds the apptainer image locally in the current folder (assumes that the user has cloned the submodules as well)
 
 ## Developers
 
