@@ -48,16 +48,17 @@ source setup.sh "" cleanup #Will unset all the environment variables
 
 ```
 
-##Container Filesystem
+## Container Filesystem
 
 ```
 /workspace #Main working folder
 /workspace/samples #Folder with the data sample used, either mounted or copied from /eos
 /workspace/workDir #Folder where the ML model files exists and all the development happens
 (Optional) /workspace/testDir #Directory with mounted test tools that can be used by the user
+
 ```
 
-##Container environment
+## Container environment
 
 The container creates a fixed environment and detects automatically whether the host machine has an NVIDIA GPU for training purposes. After that sets some of the configuration parameters and alias for execution
 
