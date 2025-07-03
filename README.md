@@ -74,15 +74,15 @@ The container creates a fixed environment and detects automatically whether the 
    
    e. `SAMPLE_NAME`: Name the sample which needs to be copied or mounted (if empty the whole directory will be taken)
    
-   f. `SAMPLE_EOS`: If [yes] selected then the /eos path for the WP2.1 project will be added automatically and the sample will be copied within the container (CAUTION: That can explode the container size when running)
+   f. `SAMPLE_EOS`: If [yes] selected then the /eos path for the WP2.1 project will be added automatically and the sample will be copied within the container (*CAUTION*: That can explode the container size when running)
    
    g. `PROJECT_FOLDER`: Define the path towards the folder where your project exists (local path) (This folder is mounted into the container)
    
-   h. `PROJECT_NAME`: Folder name where your ML code exists (basically $PROJECT_FOLDER/$PROJECT_NAME is the mounted folder)
+   h. `PROJECT_NAME`: Folder name where your ML code exists (basically `$PROJECT_FOLDER/$PROJECT_NAME` is the mounted folder)
    
    i. `TEST_FOLDER`: Extra space for testing tools or Vivado (optional)
    
-   j. `TEST_NAME`: Test folder name ($TEST_FOLDER/$TEST_NAME mounted if provided
+   j. `TEST_NAME`: Test folder name (`$TEST_FOLDER/$TEST_NAME` mounted if provided
    
    k. `KRB_ACCOUNT`: Kerberos for authentication if the sample has to be copied from /eos (when sample not available to be mounted)
    
