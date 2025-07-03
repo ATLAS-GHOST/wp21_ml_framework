@@ -33,6 +33,9 @@ git clone <ml-framework-url>.git
 git submodule update --init --recursive
 source setup.sh <config-file>.yml #Produces all the paths for developments in addition to aliases for executing the containers
 
+#The file config.yml is an example of how this configuration should look like, however if it's the first time just do the following
+source setup.sh
+
 #Executing the container
 arun #Launches the apptainer wrapper (looks for container in eos!, otherwise look below)
 drun #Executes container
