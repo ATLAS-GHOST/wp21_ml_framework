@@ -126,7 +126,7 @@ def has_gpu():
 
 def check_slash(path):
     return path if path.endswith('/') else path + '/'
-    
+
 def alias_commands(export_vars):
     dockerBase = 'docker run'
     appBase    = 'apptainer'
@@ -177,8 +177,16 @@ def alias_commands(export_vars):
     drun   = 'alias drun="'  +dockerBase+' --rm'     + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
     dshell = 'alias dshell="'+dockerBase+' --rm -it' + GPU + ' -v '+PROJECT+':/workspace/workDir'+' -v '+PASSWORD+':/secrets/password.pass:ro' + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
 
-    #Apptainer alias
-    abuild = 'abuild(){\necho "[INFO] Dependence to git-submodule within the wp21_ml_framework folder" \napptainer build -F --build-arg CONT_NAME=$CONT_NAME $CONT_NAME.sif $FRAMEWORK_DIR/apptainer/def_file/apptainer.def\n}'
+    #Apptainer alias    
+    abuild = 'abuild(){\necho "[INFO] Dependence to git-submodule within the wp21_ml_framework folder" \n\
+    AVAIL=$(df --output=avail -BG "$(pwd)" | tail -1 | tr -dc \'0-9\') \n\
+    if (( AVAIL < 17 )); then\n\
+    \techo "[ERROR] Not enough disk space for executing build, please change current directory" \n\
+    \treturn 1 \n\
+    fi \n\
+    export APPTAINER_CACHEDIR=$(pwd) \n\
+    export TMPDIR=$(pwd) \n\
+    apptainer build -F --build-arg CONT_NAME=$CONT_NAME $CONT_NAME.sif $FRAMEWORK_DIR/apptainer/def_file/apptainer.def\n}'
     arun   = 'alias arun="'   + appBase + ' run --no-home --contain --writable-tmpfs'   + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + AFILE + " --env JPORT=$JUPYTER_PORT" + ACONT + '"'
     ashell = 'alias ashell="' + appBase + ' shell --no-home --contain --writable-tmpfs' + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + AFILE + ACONT + '"'
 
@@ -196,7 +204,9 @@ def make_conf_script(export_vars):
     for key, value in export_vars['exports'].items():
         f.write(f'export {key}={value}\n')
     f.write('export CUR_DIR=$(pwd)\n')
-    f.write('export FRAMEWORK_DIR="$(find /home/$USER -type d -name \'wp21_ml_framework\' 2>/dev/null | head -n 1)"\n')
+    f.write('export FRAMEWORK_DIR="$(find $(pwd) -type d -name \'wp21_ml_framework\' 2>/dev/null | head -n 1)"\n')
+    f.write('export APPTAINER_CACHEDIR=$(pwd)')
+    f.write('export TMPDIR=$(pwd)')
     f.write('\n')
     f.write('#Alias for executing container selection (docker and apptainer)\n')
     aliasCmds = alias_commands(export_vars)
