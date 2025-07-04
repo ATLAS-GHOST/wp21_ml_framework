@@ -187,7 +187,7 @@ def alias_commands(export_vars):
     export APPTAINER_CACHEDIR=$(pwd) \n\
     export TMPDIR=$(pwd) \n\
     apptainer build -F --build-arg CONT_NAME=$CONT_NAME $CONT_NAME.sif $FRAMEWORK_DIR/apptainer/def_file/apptainer.def\n}'
-    if os.path.isfile('$CONT_NAME.sif'):
+    if os.path.isfile(export_vars['exports']['CONT_NAME']+'.sif'):
         ACONT = ' $CONT_NAME.sif'
     arun   = 'alias arun="'   + appBase + ' run --no-home --contain --writable-tmpfs'   + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + AFILE + " --env JPORT=$JUPYTER_PORT" + ACONT + '"'
     ashell = 'alias ashell="' + appBase + ' shell --no-home --contain --writable-tmpfs' + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + ' --bind ' + PASSWORD + ':/secrets/password.pass:ro' + EBIND + ATEST + AFILE + ACONT + '"'
