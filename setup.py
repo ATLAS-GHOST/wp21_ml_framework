@@ -172,12 +172,14 @@ def alias_commands(export_vars):
     AGPU  = ""
     EBIND = ""
     DBIND = ""
+    ALD   = ""
     if has_gpu():
         GPU   = " --gpus all"
         AGPU  = " --nv"
         EBIND = " --bind /usr/local/cuda:/usr/local/cuda,/usr/lib:/usr/lib"
         DBIND = " -v /usr/local/cuda:/usr/local/cuda -v /usr/lib:/usr/lib"
-        
+        ALD   = " --env LD_LIBRARY_PATH=/urs/local/cuda/targets/x86_64-linux/lib:/workspace/Conda/envs/myenv/lib"
+
     #Docker alias
     drun   = 'alias drun="'  +dockerBase+' --rm'     + GPU + ' -v '+PROJECT+':/workspace/workDir'+ DPASSWORD + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
     dshell = 'alias dshell="'+dockerBase+' --rm -it' + GPU + ' -v '+PROJECT+':/workspace/workDir'+ DPASSWORD + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
@@ -194,8 +196,8 @@ def alias_commands(export_vars):
     apptainer build -F --build-arg CONT_NAME=$CONT_NAME $CONT_NAME.sif $FRAMEWORK_DIR/apptainer/def_file/apptainer.def\n}'
     if os.path.isfile(export_vars['exports']['CONT_NAME']+'.sif'):
         ACONT = ' $CONT_NAME.sif'
-    arun   = 'alias arun="'   + appBase + ' run --no-home --contain --writable-tmpfs'   + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + APASSWORD + EBIND + ATEST + AFILE + " --env JPORT=$JUPYTER_PORT" + ACONT + '"'
-    ashell = 'alias ashell="' + appBase + ' shell --no-home --contain --writable-tmpfs' + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + APASSWORD + EBIND + ATEST + AFILE + ACONT + '"'
+    arun   = 'alias arun="'   + appBase + ' run --no-home --contain --writable-tmpfs'   + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + APASSWORD + EBIND + ATEST + AFILE + " --env JPORT=$JUPYTER_PORT" + ALD + ACONT + '"'
+    ashell = 'alias ashell="' + appBase + ' shell --no-home --contain --writable-tmpfs' + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + APASSWORD + EBIND + ATEST + AFILE + " --env JPORT=$JUPYTER_PORT" + ALD + ACONT + '"'
 
     return [drun, dshell, arun, ashell, abuild]
     
