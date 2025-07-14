@@ -196,7 +196,30 @@ def alias_commands(export_vars):
     apptainer build -F --build-arg CONT_NAME=$CONT_NAME $CONT_NAME.sif $FRAMEWORK_DIR/apptainer/def_file/apptainer.def\n}'
     if os.path.isfile(export_vars['exports']['CONT_NAME']+'.sif'):
         ACONT = ' $CONT_NAME.sif'
-    arun   = 'alias arun="'   + appBase + ' run --no-home --contain --writable-tmpfs'   + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + APASSWORD + EBIND + ATEST + AFILE + " --env JPORT=$JUPYTER_PORT" + ALD + ACONT + '"'
+    #arun   = 'alias arun="'   + appBase + ' run --no-home --contain --writable-tmpfs'   + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + APASSWORD + EBIND + ATEST + AFILE + " --env JPORT=$JUPYTER_PORT" + ALD + ACONT + '"'
+    arun = f'''arun() {{ \n\
+    USE_GPU=1\n\
+    ARGS=()\n\
+    for arg in "$@"; do\n\
+    \tif [[ "$arg" == "--no-gpu" ]]; then\n\
+    \t\tUSE_GPU=0\n\
+    \telse\n\
+    \t\tARGS+=("$arg")\n\
+    \tfi\n\
+    done\n\
+    \n\
+    CMD="{appBase} run --no-home --contain --writable-tmpfs"\n\
+    \n\
+    if [[ $USE_GPU -eq 1 ]]; then\n\
+    \tCMD+="{AGPU} {APASSWORD} {EBIND}"\n\
+    fi\n\
+    \n\
+    CMD+=" --bind {PROJECT}:/workspace/workDir {ATEST} {AFILE} --env JPORT=$JUPYTER_PORT {ALD} {ACONT}"\n\
+    CMD+=" ${{ARGS[*]}}"\n\
+    \n\
+    eval "$CMD"\n\
+    }}'''
+    
     ashell = 'alias ashell="' + appBase + ' shell --no-home --contain --writable-tmpfs' + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + APASSWORD + EBIND + ATEST + AFILE + " --env JPORT=$JUPYTER_PORT" + ALD + ACONT + '"'
 
     return [drun, dshell, arun, ashell, abuild]
