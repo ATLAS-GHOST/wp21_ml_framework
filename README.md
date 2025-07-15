@@ -49,6 +49,10 @@ jl #In Apptainer you get an alias with the Jupyter Lab running on the defined po
 ##Optional cleanup
 source setup.sh "" cleanup #Will unset all the environment variables
 
+##Optional forcefully not using the GPU (if available)
+arun --no-gpu
+drun --no-gpu
+
 ```
 
 ## Container Filesystem
@@ -60,6 +64,10 @@ source setup.sh "" cleanup #Will unset all the environment variables
 (Optional) /workspace/testDir #Directory with mounted test tools that can be used by the user
 
 ```
+
+### Docker vs Apptainer on EOS paths
+
+When using the docker container if the file is not copied in the container then you cannot mount FUSE based paths. The contianer will through a critical warning to mention that the EOS path cannot be mounted. On the contrary apptainer doesn't have this constraint so please use the apptainer wrapper for that. 
 
 ## Container environment
 
