@@ -35,6 +35,19 @@ alias_summary = ["drun: Runs docker container",
                  "arun: Runs apptainer wrapper of docker container",
                  "ashell: Runs apptainer wrapper of docker container"]
 
+def log_message(level, message):
+    RESET = "\033[0m"
+    BOLD  = "\033[1m"
+
+    COLOURS = {
+        "INFO"         : f"{BOLD}\033[34m",
+        "WARNING"      : f"{BOLD}\033[33m",
+        "CRIT. WARNING": f"{BOLD}\033[38;5;208m",
+        "ERROR"        : f"{BOLD}\033[31m"}
+
+    colour = COLOURS.get(level.upper(), BOLD)
+    print(f"{colour}[{level.upper()}]{RESET} {message}")
+
 def load_yaml_config(path):
     with open(path, 'r') as f:
         return yaml.safe_load(f)
@@ -47,7 +60,8 @@ def provide_mandatory_input(var_name, var_desc):
         value = input(f"{var_name} ({var_desc}): ")
         if value:
             return value
-        print(f"[WARNING] A value for {var_name} is mandatory to be provided")
+        #print(f"[WARNING] A value for {var_name} is mandatory to be provided")
+        log_message("warning",f"A value for {var_name} is mandatory to be provided")
         
 def check_allowed_values(var_name, var_desc, allowed_values):
     value = ""
@@ -55,7 +69,8 @@ def check_allowed_values(var_name, var_desc, allowed_values):
         value = provide_mandatory_input(var_name, var_desc)
         if value in allowed_values:
             return value
-        print(f"[WARNING] Invalid input value for {var_name} please choose between {', '.join(allowed_values)}")
+        #print(f"[WARNING] Invalid input value for {var_name} please choose between {', '.join(allowed_values)}")
+        log_message("warning",f"Invalid input value for {var_name} please choose between{', '.join(allowed_values)}")
 
 def check_allowed_with_custom_values(var_name, var_desc, allowed_values):
     value = ""
@@ -65,11 +80,13 @@ def check_allowed_with_custom_values(var_name, var_desc, allowed_values):
             if value == "custom":                
                 value = input(f'[INFO] Provide custom input for {var_name} (empties allowed): ')
             return value
-    print(f"[WARNING] Invalid input value for {var_name} please choose between {', '.join(allowed_values)}")
+    #print(f"[WARNING] Invalid input value for {var_name} please choose between {', '.join(allowed_values)}")
+    log_message("warning",f"Invalid input value for {var_name} please choose between {', '.join(allowed_values)}")
 
 def prompt_user_for_env():
     exports = {}
-    print(f"[INFO] No config provided and no activate environment. Let's setup the required environment variables: ")
+    #print(f"[INFO] No config provided and no activate environment. Let's setup the required environment variables: ")
+    log_message("info",f"No config provided and no activated environment. Let's setup the required environment variables: ")
     for i_var, i_desc in zip(var, var_desc):
         if i_var == "KUBEFLOW_FILE" or i_var == "SAMPLE_EOS":
             allowed        = {"yes", "no"}
@@ -103,7 +120,8 @@ def dump_config_yaml(exports, filename):
         }
     with open(filename, "w") as f:
         yaml.dump(config, f, default_flow_style=False)
-    print(f"[INFO] Configuration written to {filename}")
+    #print(f"[INFO] Configuration written to {filename}")
+    log_message("info",f"Configuration written to {filename}")
 
 def has_gpu():
     if not shutil.which('nvidia-smi'):
@@ -137,7 +155,8 @@ def alias_commands(export_vars):
     DPASSWORD = ''
     APASSWORD = ''
     if export_vars['exports']['KRB_PASSWORD'] != '':
-        print(f"[INFO] Password file provided from: {export_vars['exports']['KRB_PASSWORD']}")        
+        #print(f"[INFO] Password file provided from: {export_vars['exports']['KRB_PASSWORD']}")
+        log_message("info",f"Password file provided from {export_vars['exports']['KRB_PASSWORD']}")
         DPASSWORD = ' -v $KRB_PASSWORD:/secrets/password.pass:ro'
         APASSWORD = ' --bind $KRB_PASSWORD:/secrets/password.pass:ro'
 
@@ -145,9 +164,14 @@ def alias_commands(export_vars):
     AFILE = ' --env SAMPLE_PATH=$SAMPLE_PATH --env SAMPLE_NAME=$SAMPLE_NAME'
     if "no" in export_vars['exports']['SAMPLE_EOS']:
         FILE  = ' -v $SAMPLE_PATH$SAMPLE_NAME:/workspace/samples/$SAMPLE_NAME:ro'
+        if '/eos' in export_vars['exports']['SAMPLE_PATH']:
+            #print(f'[CRIT. WARNING] Mount path points to FUSE based (eos) directory that cannot run with docker, please use apptainer')
+            log_message("crit. warning",f"Mount path points to FUSE based (eos) directory that cannot run with docker, please use apptainer")
+            FILE = ''
         AFILE = ' --bind $SAMPLE_PATH$SAMPLE_NAME:/workspace/samples/$SAMPLE_NAME:ro'
 
-    print(f"[INFO] Sample command: {os.environ.get('SAMPLE_EOS')}")
+    #print(f"[INFO] Sample command: {os.environ.get('SAMPLE_EOS')}")
+    log_message("info",f"Sample command: {os.environ.get('SAMPLE_EOS')}")
 
     CONT  = ' $CONT_NAME:latest'
     ACONT = ' $CONT_NAME.sif'
@@ -157,10 +181,12 @@ def alias_commands(export_vars):
         CONT = ' /cvmfs/unpacked.cern.ch/$CONT_NAME:latest'
 
     if os.path.ismount('/eos'):
-        print(f"[INFO] EOS is mounted in host machine hence apptainers can be fetched")
+        #print(f"[INFO] EOS is mounted in host machine hence apptainers can be fetched")
+        log_message("info",f"EOS is mounted in host machine hence apptainers can be fetched")
         ACONT = ' /eos/project/a/atlas-ngt-wp21/apptainer_containers/$CONT_NAME.sif'
         
-    print(f"[INFO] Image path: {export_vars['exports']['CONT_LOC']}")
+    #print(f"[INFO] Image path: {export_vars['exports']['CONT_LOC']}")
+    log_message("info",f"Image path: {export_vars['exports']['CONT_LOC']}")
 
     ATEST = ''
     DTEST = ''
@@ -181,8 +207,56 @@ def alias_commands(export_vars):
         ALD   = " --env LD_LIBRARY_PATH=/urs/local/cuda/targets/x86_64-linux/lib:/workspace/Conda/envs/myenv/lib"
 
     #Docker alias
-    drun   = 'alias drun="'  +dockerBase+' --rm'     + GPU + ' -v '+PROJECT+':/workspace/workDir'+ DPASSWORD + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
-    dshell = 'alias dshell="'+dockerBase+' --rm -it' + GPU + ' -v '+PROJECT+':/workspace/workDir'+ DPASSWORD + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
+    #drun   = 'alias drun="'  +dockerBase+' --rm'     + GPU + ' -v '+PROJECT+':/workspace/workDir'+ DPASSWORD + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
+    drun = f'''drun() {{ \n\
+    USE_GPU=1\n\
+    ARGS=()\n\
+    for arg in "$@"; do\n\
+    \tif [[ "$arg" == "--no-gpu" ]]; then\n\
+    \t\tUSE_GPU=0\n\
+    \telse\n\
+    \t\tARGS+=("$arg")\n\
+    \tfi\n\
+    done\n\
+    \n\
+    CMD="{dockerBase} --rm"\n\
+    \n\
+    if [[ $USE_GPU -eq 1 ]]; then\n\
+    \tCMD+="{GPU} {DBIND}"\n\
+    fi\n\
+    \n\
+    CMD+=" -v {PROJECT}:/workspace/workDir {DPASSWORD} {DTEST} {FILE} {ACCOUNT} -p $JUPYTER_PORT:$JUPYTER_PORT {CONT}"\n\
+    CMD+=" ${{ARGS[*]}}"\n\
+    \n\
+    eval "$CMD"\n\
+    }}'''
+    
+    #dshell = 'alias dshell="'+dockerBase+' --rm -it' + GPU + ' -v '+PROJECT+':/workspace/workDir'+ DPASSWORD + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
+
+    dshell = f'''dshell() {{ \n\
+    USE_GPU=1\n\
+    ARGS=()\n\
+    for arg in "$@"; do\n\
+    \tif [[ "$arg" == "--no-gpu" ]]; then\n\
+    \t\tUSE_GPU=0\n\
+    \telse\n\
+    \t\tARGS+=("$arg")\n\
+    \tfi\n\
+    done\n\
+    \n\
+    CMD="{dockerBase} --rm -it"\n\
+    \n\
+    if [[ $USE_GPU -eq 1 ]]; then\n\
+    \tCMD+="{GPU} {DBIND}"\n\
+    fi\n\
+    \n\
+    CMD+=" -v {PROJECT}:/workspace/workDir {DPASSWORD} {DTEST} {FILE} {ACCOUNT} -p $JUPYTER_PORT:$JUPYTER_PORT {CONT}"\n\
+    CMD+=" ${{ARGS[*]}}"\n\
+    \n\
+    eval "$CMD"\n\
+    }}'''
+
+    dclean = 'alias dclean="docker system prune -a --volumes -f"'
 
     #Apptainer alias    
     abuild = 'abuild(){\necho "[INFO] Dependence to git-submodule within the wp21_ml_framework folder" \n\
@@ -211,10 +285,10 @@ def alias_commands(export_vars):
     CMD="{appBase} run --no-home --contain --writable-tmpfs"\n\
     \n\
     if [[ $USE_GPU -eq 1 ]]; then\n\
-    \tCMD+="{AGPU} {APASSWORD} {EBIND}"\n\
+    \tCMD+="{AGPU} {EBIND}"\n\
     fi\n\
     \n\
-    CMD+=" --bind {PROJECT}:/workspace/workDir {ATEST} {AFILE} --env JPORT=$JUPYTER_PORT {ALD} {ACONT}"\n\
+    CMD+=" --bind {PROJECT}:/workspace/workDir {APASSWORD} {ATEST} {AFILE} --env JPORT=$JUPYTER_PORT {ALD} {ACONT}"\n\
     CMD+=" ${{ARGS[*]}}"\n\
     \n\
     eval "$CMD"\n\
@@ -222,7 +296,9 @@ def alias_commands(export_vars):
     
     ashell = 'alias ashell="' + appBase + ' shell --no-home --contain --writable-tmpfs' + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + APASSWORD + EBIND + ATEST + AFILE + " --env JPORT=$JUPYTER_PORT" + ALD + ACONT + '"'
 
-    return [drun, dshell, arun, ashell, abuild]
+    aclean = 'alias aclean="apptainer cache clean -f"'
+
+    return [drun, dshell, dclean, arun, ashell, abuild, aclean]
     
 def make_conf_script(export_vars):
     f = open('.run_conf.sh','w')
@@ -259,10 +335,12 @@ def make_cleanup_script(export_vars):
     f.write('unset CUR_DIR\n')
     f.write('unset FRAMEWORK_DIR\n')
     f.write('\n')
-    f.write('unalias arun\n')
+    f.write('unset -f arun\n')
     f.write('unalias ashell\n')
-    f.write('unalias drun\n')
-    f.write('unalias dshell\n')
+    f.write('unalias aclean\n')
+    f.write('unset -f drun\n')
+    f.write('unset -f dshell\n')
+    f.write('unalias dclean\n')
     f.close()
     
 def main():
@@ -272,13 +350,16 @@ def main():
 
     export_vars = {}
     if args.config and os.path.isfile(args.config):
-        print(f"[INFO] Loading config from {args.config}")
+        #print(f"[INFO] Loading config from {args.config}")
+        log_message("info",f"Loading config from {args.config}")
         export_vars = load_yaml_config(args.config)
     else:
-        print(f"[INFO] No config file has been provided. Checking environment...")
+        #print(f"[INFO] No config file has been provided. Checking environment...")
+        log_message("info",f"No config file has been provided. Checking environment...")
         export_vars = get_existing_var()
         if export_vars:
-            print(f"[INFO] Found existing envrionment variables:")
+            #print(f"[INFO] Found existing envrionment variables:")
+            log_message("info",f"Found existing environment variables:")
             for k, v in export_vars.items():
                 print(f"   {k} = {v}")
         else:
