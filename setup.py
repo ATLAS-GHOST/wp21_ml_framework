@@ -266,7 +266,7 @@ def alias_commands(export_vars):
     \treturn 1 \n\
     fi \n\
     export APPTAINER_CACHEDIR=$(pwd) \n\
-    export TMPDIR=$(pwd) \n\
+    export APPTAINER_TMPDIR=$(pwd) \n\
     apptainer build -F --build-arg CONT_NAME=$CONT_NAME $CONT_NAME.sif $FRAMEWORK_DIR/apptainer/def_file/apptainer.def\n}'
     if os.path.isfile(export_vars['exports']['CONT_NAME']+'.sif'):
         ACONT = ' $CONT_NAME.sif'
@@ -313,8 +313,8 @@ def make_conf_script(export_vars):
         f.write(f'export {key}={value}\n')
     f.write('export CUR_DIR=$(pwd)\n')
     f.write('export FRAMEWORK_DIR="$(find $(pwd) -type d -name \'wp21_ml_framework\' 2>/dev/null | head -n 1)"\n')
-    f.write('export APPTAINER_CACHEDIR=$(pwd)')
-    f.write('export TMPDIR=$(pwd)')
+    f.write('export APPTAINER_CACHEDIR=$(pwd)\n')
+    f.write('export APPTAINER_TMPDIR=$(pwd)')
     f.write('\n')
     f.write('#Alias for executing container selection (docker and apptainer)\n')
     aliasCmds = alias_commands(export_vars)
