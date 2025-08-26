@@ -113,6 +113,17 @@ The container creates a fixed environment and detects automatically whether the 
    
    d. `(Developers) abuild`: Uses the .def file from the apptainer submodules and builds the apptainer image locally in the current folder (assumes that the user has cloned the submodules as well)
 
+### Building Apptainers (Developers only!)
+
+In order to build the propoer apptainer wrapper for the different docker containers maintained by WP2.1 please follow the commands below.
+
+```
+source setup.sh <config>.yml #Container will be pulled based on mention in the configuration
+abuild --tmp-dir <path-to-tmp-dir> --sif-dir <path-for-sif-file> --cache-dir <path-to-cache-dir> #All three are optional and if not provided the $(pwd) path is used
+```
+
+After completing those the .sif file will be generated in the folder indicated by the --sif-file (or $(pwd)). If the .sif file exists in the project folder this sif file is used. If a version of the sif file is present in eos then this version is picked automatically (priority to local).
+
 ## Developers
 
 The sub-modules are all maintained by the ATLAS NextGen WP2.1 team. For contact please send us an [email](mailto:altas-ngt-wp21@cern.ch)
