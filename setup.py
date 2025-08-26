@@ -258,16 +258,56 @@ def alias_commands(export_vars):
 
     dclean = 'alias dclean="docker system prune -a --volumes -f"'
 
-    #Apptainer alias    
-    abuild = 'abuild(){\necho "[INFO] Dependence to git-submodule within the wp21_ml_framework folder" \n\
-    AVAIL=$(df --output=avail -BG "$(pwd)" | tail -1 | tr -dc \'0-9\') \n\
-    if (( AVAIL < 17 )); then\n\
-    \techo "[ERROR] Not enough disk space for executing build, please change current directory" \n\
+    #Apptainer alias
+    abuild = '''abuild() { \n\
+    echo "[INFO] Dependence to git-submodule within the wp21_ml_framework folder" \n\
+    local sif_dir="$(pwd)" \n\
+    local tmp_dir="$(pwd)" \n\
+    local cache_dir="$(pwd)" \n\
+    \n\
+    while [[ $# -gt 0 ]]; do \n\
+    \tcase "$1" in \n\
+    \t\t--sif-dir) \n\
+    \t\t\tsif_dir="$2" \n\
+    \t\t\tshift 2 \n\
+    \t\t\t;; \n\
+    \t\t--tmp-dir) \n\
+    \t\t\ttmp_dir="$2" \n\
+    \t\t\tshift 2 \n\
+    \t\t\t;; \n\
+    \t\t--cache-dir) \n\
+    \t\t\tcache_dir="$2" \n\
+    \t\t\tshift 2 \n\
+    \t\t\t;; \n\
+    \t\t*) \n\
+    \t\t\techo "[WARNING] Unknown option: $1" \n\
+    \t\t\tshift \n\
+    \t\t\t;; \n\
+    \tesac \n\
+    done \n\
+    \n\
+    AVAIL=$(df --output=avail -BG "$sif_dir" | tail -1 | tr -dc '0-9') \n\
+    if (( AVAIL < 17 )); then \n\
+    \techo "[ERROR] Not enough disk space for executing build in $sif_dir" \n\
     \treturn 1 \n\
     fi \n\
-    export APPTAINER_CACHEDIR=$(pwd) \n\
-    export APPTAINER_TMPDIR=$(pwd) \n\
-    apptainer build -F --build-arg CONT_NAME=$CONT_NAME $CONT_NAME.sif $FRAMEWORK_DIR/apptainer/def_file/apptainer.def\n}'
+    \n\
+    export APPTAINER_CACHEDIR="$cache_dir" \n\    
+    export APPTAINER_TMPDIR="$tmp_dir" \n\
+    \n\
+    apptainer build -F --build-arg CONT_NAME=$CONT_NAME "$sif_dir/$CONT_NAME.sif" "$FRAMEWORK_DIR/apptainer/def_file/apptainer.def" \n\
+    \n\
+    }'''
+    
+    # abuild = 'abuild(){\necho "[INFO] Dependence to git-submodule within the wp21_ml_framework folder" \n\
+    # AVAIL=$(df --output=avail -BG "$(pwd)" | tail -1 | tr -dc \'0-9\') \n\
+    # if (( AVAIL < 17 )); then\n\
+    # \techo "[ERROR] Not enough disk space for executing build, please change current directory" \n\
+    # \treturn 1 \n\
+    # fi \n\
+    # export APPTAINER_CACHEDIR=$(pwd) \n\
+    # export APPTAINER_TMPDIR=$(pwd) \n\
+    # apptainer build -F --build-arg CONT_NAME=$CONT_NAME $CONT_NAME.sif $FRAMEWORK_DIR/apptainer/def_file/apptainer.def\n}'
     if os.path.isfile(export_vars['exports']['CONT_NAME']+'.sif'):
         ACONT = ' $CONT_NAME.sif'
     #arun   = 'alias arun="'   + appBase + ' run --no-home --contain --writable-tmpfs'   + AGPU + ' --bind ' + PROJECT + ':/workspace/workDir' + APASSWORD + EBIND + ATEST + AFILE + " --env JPORT=$JUPYTER_PORT" + ALD + ACONT + '"'
@@ -313,8 +353,8 @@ def make_conf_script(export_vars):
         f.write(f'export {key}={value}\n')
     f.write('export CUR_DIR=$(pwd)\n')
     f.write('export FRAMEWORK_DIR="$(find $(pwd) -type d -name \'wp21_ml_framework\' 2>/dev/null | head -n 1)"\n')
-    f.write('export APPTAINER_CACHEDIR=$(pwd)\n')
-    f.write('export APPTAINER_TMPDIR=$(pwd)')
+    #f.write('export APPTAINER_CACHEDIR=$(pwd)\n')
+    #f.write('export APPTAINER_TMPDIR=$(pwd)')
     f.write('\n')
     f.write('#Alias for executing container selection (docker and apptainer)\n')
     aliasCmds = alias_commands(export_vars)
