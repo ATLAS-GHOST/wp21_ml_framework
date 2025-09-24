@@ -41,7 +41,7 @@ qat-train:
     echo "[qat-train] shard ${CI_NODE_INDEX}/${CI_NODE_TOTAL}"
     SHARD=$((CI_NODE_INDEX - 1))
     IN_DIR="${QAT_IN_ROOT}/folder_${SHARD}"
-    OUT_DIR="${QAT_OUT_ROOT}/${SHARD}"
+    OUT_DIR="${QAT_OUT_ROOT}/$dir_{SHARD}"
     test -d "${IN_DIR}" || { echo "Missing ${IN_DIR}" >&2; exit 2; }
     mkdir -p "${OUT_DIR}"
     source ~/.bashrc
@@ -68,8 +68,8 @@ hls-convert:
   script: |
     echo "[hls-convert] shard ${CI_NODE_INDEX}/${CI_NODE_TOTAL} using ${IN_DIR}"    
     SHARD=$((CI_NODE_INDEX - 1))
-    IN_DIR="artifacts/qat/${SHARD}"
-    OUT_DIR="${HLS_OUT_ROOT}/${SHARD}"
+    IN_DIR="artifacts/qat/dir_${SHARD}"
+    OUT_DIR="${HLS_OUT_ROOT}/dir_${SHARD}"
     test -d "${IN_DIR}" || { echo "Missing ${IN_DIR}" >&2; exit 2; }
     mkdir -p "${OUT_DIR}"
     source ~/.bashrc
