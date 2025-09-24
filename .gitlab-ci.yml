@@ -52,7 +52,7 @@ qat-train:
     when: on_success
     expire_in: 7 days
     paths:
-      - artifacts/qat/${CI_NODE_INDEX-1}/
+      - artifacts/qat/
 
 #Conversion of model into HLS code for synthesis
 hls-convert:
@@ -80,7 +80,7 @@ hls-convert:
     when: on_success
     expire_in: 7 days
     paths:
-      - artifacts/hls/${CI_NODE_INDEX -1}/
+      - artifacts/hls/
 
 #Firmware building (i.e. synthesis) - using CI4FPGA infrastructure
 fw-build:
