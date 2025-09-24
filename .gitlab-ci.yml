@@ -44,10 +44,11 @@ qat-train:
     OUT_DIR="${QAT_OUT_ROOT}/$dir_{SHARD}"
     test -d "${IN_DIR}" || { echo "Missing ${IN_DIR}" >&2; exit 2; }
     mkdir -p "${OUT_DIR}"
+    ls ${QAT_OUT_ROOT}/
     source ~/.bashrc
     conda init
     conda activate myenv
-    python --version
+    python --version    
   artifacts:
     when: on_success
     expire_in: 7 days
