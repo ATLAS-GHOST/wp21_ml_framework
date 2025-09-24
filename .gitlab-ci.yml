@@ -18,6 +18,7 @@ hat-train:
     source ~/.bashrc
     conda init
     conda activate myenv
+    python --version
   artifacts:
     when: on_success
     expire_in: 7 days
@@ -46,6 +47,7 @@ qat-train:
     source ~/.bashrc
     conda init
     conda activate myenv
+    python --version
   artifacts:
     when: on_success
     expire_in: 7 days
@@ -73,6 +75,7 @@ hls-convert:
     source ~/.bashrc
     conda init
     conda activate myenv
+    python --version    
   artifacts:
     when: on_success
     expire_in: 7 days
