@@ -5,9 +5,11 @@ hat-train:
   stage: hat-train
   tags: [cern-nextgen-h100]
   image: registry.cern.ch/atlas-ngt-wp21/train
+  variables:
+    HAT_OUT_DIR: "artifacts/hat"
   script: |
     echo "[hat-train] start"
-    mkdir artifacts/hat
+    mkdir -p "${HAT_OUT_DIR}"
     for i in 0 1 2 3 4; do
       d=artifacts/hat/folder_${i}
       mkdir -p "$d"
