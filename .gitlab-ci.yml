@@ -43,6 +43,7 @@ qat-train:
     OUT_DIR="${QAT_OUT_ROOT}/${SHARD}"
     test -d "${IN_DIR}" || { echo "Missing ${IN_DIR}" >&2; exit 2; }
     mkdir -p "${OUT_DIR}"
+    source ~/.bashrc
     conda init
     conda activate myenv
   artifacts:
@@ -69,6 +70,7 @@ hls-convert:
     OUT_DIR="${HLS_OUT_ROOT}/${SHARD}"
     test -d "${IN_DIR}" || { echo "Missing ${IN_DIR}" >&2; exit 2; }
     mkdir -p "${OUT_DIR}"
+    source ~/.bashrc
     conda init
     conda activate myenv
   artifacts:
