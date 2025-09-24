@@ -15,6 +15,7 @@ hat-train:
       mkdir -p "$d"
       echo "model for shard $i" > "${d}/model.bin"
     done
+    source ~/.bashrc
     conda init
     conda activate myenv
   artifacts:
