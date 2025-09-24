@@ -15,6 +15,7 @@ hat-train:
       mkdir -p "$d"
       echo "model for shard $i" > "${d}/model.bin"
     done
+    conda init
     conda activate myenv
   artifacts:
     when: on_success
@@ -41,6 +42,7 @@ qat-train:
     OUT_DIR="${QAT_OUT_ROOT}/${SHARD}"
     test -d "${IN_DIR}" || { echo "Missing ${IN_DIR}" >&2; exit 2; }
     mkdir -p "${OUT_DIR}"
+    conda init
     conda activate myenv
   artifacts:
     when: on_success
@@ -66,6 +68,8 @@ hls-convert:
     OUT_DIR="${HLS_OUT_ROOT}/${SHARD}"
     test -d "${IN_DIR}" || { echo "Missing ${IN_DIR}" >&2; exit 2; }
     mkdir -p "${OUT_DIR}"
+    conda init
+    conda activate myenv
   artifacts:
     when: on_success
     expire_in: 7 days
