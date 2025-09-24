@@ -1,0 +1,28 @@
+stages: [hat-train, qat-train]
+
+hat-train:
+  stage: hat-train
+  tags: [cern-nextgen-h100]
+  image: registry.cern.ch/atlas-ngt-wp21/train
+  script: |
+    echo "[hat-train] start"
+    mkdir artifacts
+    touch artifacts/test.sh
+    conda activate myenv
+  artifacts:
+    when: on_success
+    expire_in: 7 days
+    paths:
+      - artifacts/
+
+qat-train:
+  stage: qat-train
+  tags: [cern-nextgen-h100]
+  image: registry.cern.ch/atlas-ngt-wp21/train
+  parallel: 5
+  needs:
+    - job: hat-train
+      artifacts: true
+  script: |
+    echo "[qat-train] shard ${CI_NODE_INDEX}/${CI_NODE_TOTAL}"
+    conda activate myenv
