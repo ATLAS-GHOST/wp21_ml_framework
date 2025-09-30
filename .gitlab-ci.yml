@@ -1,103 +1,94 @@
 stages: [hat-train, qat-train, hls-convert, fw-build]
 
+variables:
+  GIT_CLONE_PATH: "$CI_BUILDS_DIR/workspace/workDir"
+
 #Stage where the model is optimised against hyper-parameters
 hat-train:
   stage: hat-train
   tags: [cern-nextgen-h100]
   image: registry.cern.ch/atlas-ngt-wp21/train
-  variables:
-    HAT_OUT_DIR: "artifacts/hat"
-  script: |
-    echo "[hat-train] start"
-    mkdir -p "${HAT_OUT_DIR}"
-    for i in 0 1 2 3 4; do
-      d=artifacts/hat/folder_${i}
-      mkdir -p "$d"
-      echo "model for shard $i" > "${d}/model.bin"
-    done
+  script:
+    pwd
+    ls
     source ~/.bashrc
     conda init
-    conda activate myenv
-    python --version
-  artifacts:
-    when: on_success
-    expire_in: 7 days
-    paths:
-      - artifacts/hat/
-
+    myenv    
+  
+    
 #Stage where quantisation aware training optimises for physics performances
-qat-train:
-  stage: qat-train
-  tags: [cern-nextgen-h100]
-  image: registry.cern.ch/atlas-ngt-wp21/train
-  parallel: 5
-  needs:
-    - job: hat-train
-      artifacts: true
-  variables:
-    QAT_IN_ROOT: "artifacts/hat"
-    QAT_OUT_ROOT: "artifacts/qat"
-  script: |
-    echo "[qat-train] shard ${CI_NODE_INDEX}/${CI_NODE_TOTAL}"
-    SHARD=$((CI_NODE_INDEX - 1))
-    IN_DIR="${QAT_IN_ROOT}/folder_${SHARD}"
-    OUT_DIR="${QAT_OUT_ROOT}/$dir_{SHARD}"
-    test -d "${IN_DIR}" || { echo "Missing ${IN_DIR}" >&2; exit 2; }
-    mkdir -p "${OUT_DIR}"
-    ls ${QAT_OUT_ROOT}/
-    source ~/.bashrc
-    conda init
-    conda activate myenv
-    python --version    
-  artifacts:
-    when: on_success
-    expire_in: 7 days
-    paths:
-      - artifacts/qat/
+# qat-train:
+#   stage: qat-train
+#   tags: [cern-nextgen-h100]
+#   image: registry.cern.ch/atlas-ngt-wp21/train
+#   parallel: 5
+#   needs:
+#     - job: hat-train
+#       artifacts: true
+#   variables:
+#     QAT_IN_ROOT: "artifacts/hat"
+#     QAT_OUT_ROOT: "artifacts/qat"
+#   script: |
+#     echo "[qat-train] shard ${CI_NODE_INDEX}/${CI_NODE_TOTAL}"
+#     SHARD=$((CI_NODE_INDEX - 1))
+#     IN_DIR="${QAT_IN_ROOT}/folder_${SHARD}"
+#     OUT_DIR="${QAT_OUT_ROOT}/$dir_{SHARD}"
+#     test -d "${IN_DIR}" || { echo "Missing ${IN_DIR}" >&2; exit 2; }
+#     mkdir -p "${OUT_DIR}"
+#     ls ${QAT_OUT_ROOT}/
+#     source ~/.bashrc
+#     conda init
+#     conda activate myenv
+#     python --version    
+#   artifacts:
+#     when: on_success
+#     expire_in: 7 days
+#     paths:
+#       - artifacts/qat/
 
-#Conversion of model into HLS code for synthesis
-hls-convert:
-  stage: hls-convert
-  tags: [cern-nextgen-mi300x]
-  image: registry.cern.ch/atlas-ngt-wp21/hls4ml_only
-  parallel: 5
-  needs:
-    - job: qat-train
-      artifacts: true
-  variables:
-    HLT_OUT_ROOT: "artifacts/hls"
-  script: |
-    echo "[hls-convert] shard ${CI_NODE_INDEX}/${CI_NODE_TOTAL} using ${IN_DIR}"    
-    SHARD=$((CI_NODE_INDEX - 1))
-    IN_DIR="artifacts/qat/dir_${SHARD}"
-    OUT_DIR="${HLS_OUT_ROOT}/dir_${SHARD}"
-    test -d "${IN_DIR}" || { echo "Missing ${IN_DIR}" >&2; exit 2; }
-    mkdir -p "${OUT_DIR}"
-    source ~/.bashrc
-    conda init
-    conda activate myenv
-    python --version    
-  artifacts:
-    when: on_success
-    expire_in: 7 days
-    paths:
-      - artifacts/hls/
+# #Conversion of model into HLS code for synthesis
+# hls-convert:
+#   stage: hls-convert
+#   tags: [cern-nextgen-mi300x]
+#   image: registry.cern.ch/atlas-ngt-wp21/hls4ml_only
+#   parallel: 5
+#   needs:
+#     - job: qat-train
+#       artifacts: true
+#   variables:
+#     HLT_OUT_ROOT: "artifacts/hls"
+#   script: |
+#     echo "[hls-convert] shard ${CI_NODE_INDEX}/${CI_NODE_TOTAL} using ${IN_DIR}"    
+#     SHARD=$((CI_NODE_INDEX - 1))
+#     IN_DIR="artifacts/qat/dir_${SHARD}"
+#     OUT_DIR="${HLS_OUT_ROOT}/dir_${SHARD}"
+#     test -d "${IN_DIR}" || { echo "Missing ${IN_DIR}" >&2; exit 2; }
+#     mkdir -p "${OUT_DIR}"
+#     source ~/.bashrc
+#     conda init
+#     conda activate myenv
+#     python --version    
+#   artifacts:
+#     when: on_success
+#     expire_in: 7 days
+#     paths:
+#       - artifacts/hls/
 
-#Firmware building (i.e. synthesis) - using CI4FPGA infrastructure
-fw-build:
-  stage: fw-build
-  tags: [fpga-large]
-  image: registry.cern.ch/ci4fpga/vivado:2024.1
-  parallel: 5
-  needs:
-    - job: hls-convert
-      artifacts: true
-  script: |
-    echo "[fw-build] collection all HLS shard outputs"
-  artifacts:
-    when: on_success
-    expire_in: 30 days
-    paths:
-      - artifacts/fw/
+# #Firmware building (i.e. synthesis) - using CI4FPGA infrastructure
+# fw-build:
+#   stage: fw-build
+#   tags: [fpga-large]
+#   image: registry.cern.ch/ci4fpga/vivado:2024.1
+#   parallel: 5
+#   needs:
+#     - job: hls-convert
+#       artifacts: true
+#   script: |
+#     echo "[fw-build] collection all HLS shard outputs"
+#   artifacts:
+#     when: on_success
+#     expire_in: 30 days
+#     paths:
+#       - artifacts/fw/
     
 
