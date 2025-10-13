@@ -42,5 +42,7 @@ for infile in "${files[@]}"; do
     hepconvert root-to-parquet "$infile" "$outfile" -t ntuple
 done
 
-echo "All $total files converted successfully!"
+echo "All $total files converted successfully! Now merging to fewer files for faster reading..."
+
+python merge_parquet_files.py $INPUT_DIR --out_folder "$OUTPUT_DIR/merged"
 
