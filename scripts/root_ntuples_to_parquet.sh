@@ -42,5 +42,5 @@ for infile in "${files[@]}"; do
     hepconvert root-to-parquet "$infile" "$outfile" -t ntuple
 done
 
-echo "✅ All $total files converted successfully!"
+echo "All $total files converted successfully!"
 
