@@ -23,10 +23,59 @@ hat-train:
     - mkdir -p "$WORK_DIR"
     - ln -s $PROJECT/* $WORK_DIR
     - source ~/.bashrc
-    - python --version
     - myenv
-    - python --version
+    - mkdir -p out/folder_0 out/folder_1 out/folder_2 out/folder_3 out/folder_4
+  artifacts:
+    paths: [out/]
+    expire_in: 2 days
+
+.qat-template:
+  stage: qat-train
+  tags: [cern-nextgen-h100]
+  image: registry.cern.ch/atlas-ngt-wp21/train
+  script:
+    - echo "EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
+    - ln -s $EOS_SAMPLES/* $FILE
+    - mkdir -p "$WORK_DIR"
+    - ln -s $PROJECT/* WORK_DIR
+    - source ~/.bashrc
+    - myenv
+    - mkdir -p qat/$idx
+  artifacts:
+    paths: ["qat/"]
+    expire_in: 2 days
+
+qat-0:
+  extends: .qat-template
+  needs: [{job: hat-stage, artifacts: true}]
+  dependencies: ["hat-stage"],
+  variables: { IDX: "0" }
     
+qat-1:
+  extends: .qat-template
+  needs: [{job: hat-stage, artifacts: true}]
+  dependencies: ["hat-stage"],
+  variables: { IDX: "1" }
+
+qat-2:
+  extends: .qat-template
+  needs: [{job: hat-stage, artifacts: true}]
+  dependencies: ["hat-stage"],
+  variables: { IDX: "2" }
+
+qat-3:
+  extends: .qat-template
+  needs: [{job: hat-stage, artifacts: true}]
+  dependencies: ["hat-stage"],
+  variables: { IDX: "3" }
+
+qat-4:
+  extends: .qat-template
+  needs: [{job: hat-stage, artifacts: true}]
+  dependencies: ["hat-stage"],
+  variables: { IDX: "4" }
+  
+  
 #Stage where quantisation aware training optimises for physics performances
 # qat-train:
 #   stage: qat-train
