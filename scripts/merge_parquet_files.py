@@ -37,11 +37,11 @@ if __name__ == "__main__":
     parquet_utils = ParquetUtils(to_merge_dir)
     parquet_groups = parquet_utils.split_groups(n_events_per_group=batch_size)
     for i, pg in enumerate(parquet_groups):
-        log_message("INFO", f"Merging group {i+1} of {len(parquet_groups)}")
+        out_path = os.path.normpath(os.path.join(merge_out_folder, f"{sample_stub}.{i}.parquet"))
+        log_message("INFO", f"Merging group {i+1} of {len(parquet_groups)} to {out_path}")
         array = data_loader.load_parquet(to_merge_dir, n_events=None, parquet_row_groups=pg)
-        out_path = os.path.join(merge_out_folder, f"{sample_stub}.{i}.parquet")
         ak.to_parquet(array, out_path, parquet_compliant_nested=True)
-    ak.to_parquet_dataset(dir_name)
+    ak.to_parquet_dataset(merge_out_folder)
 
     log_message("INFO", f"Merging successful, merged files are in {merge_out_folder}")
 
