@@ -48,31 +48,31 @@ hat-train:
 qat-0:
   extends: .qat-template
   needs: [{job: hat-stage, artifacts: true}]
-  dependencies: ["hat-stage"],
+  dependencies: ["hat-stage"]
   variables: { IDX: "0" }
     
 qat-1:
   extends: .qat-template
   needs: [{job: hat-stage, artifacts: true}]
-  dependencies: ["hat-stage"],
+  dependencies: ["hat-stage"]
   variables: { IDX: "1" }
 
 qat-2:
   extends: .qat-template
   needs: [{job: hat-stage, artifacts: true}]
-  dependencies: ["hat-stage"],
+  dependencies: ["hat-stage"]
   variables: { IDX: "2" }
 
 qat-3:
   extends: .qat-template
   needs: [{job: hat-stage, artifacts: true}]
-  dependencies: ["hat-stage"],
+  dependencies: ["hat-stage"]
   variables: { IDX: "3" }
 
 qat-4:
   extends: .qat-template
   needs: [{job: hat-stage, artifacts: true}]
-  dependencies: ["hat-stage"],
+  dependencies: ["hat-stage"]
   variables: { IDX: "4" }
   
   
