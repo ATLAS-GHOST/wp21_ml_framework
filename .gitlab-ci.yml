@@ -10,7 +10,7 @@ variables:
 #Helper definition
 default:
   before_script:
-    - alias myenv='conda activate myenv'
+    - myenv() { conda activate myenv; }
 
 #Stage where the model is optimised against hyper-parameters
 hat-train:
