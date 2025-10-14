@@ -5,7 +5,7 @@ sys.path.append(os.path.join(this_dir, "..", "wp21_train"))
 
 import awkward as ak
 import argparse
-from wp21_train.data import Sample, DataLoader
+from wp21_train.data import Sample, DataLoader, ParquetUtils
 from wp21_train.utils.logger import log_message
 
 if __name__ == "__main__":
@@ -26,23 +26,24 @@ if __name__ == "__main__":
     out_folder = args.out_folder
 
     sample = Sample(sample_folder)
-    assert sample.has_parquet(), "Validation failed"
   
     sample_stub = os.path.basename(sample_folder)
-    parquet_folder_path = sample.get_expected_parquet_folder_path()
-    #dir_name = os.path.join(parquet_folder_path, "merged")
-    dir_name = out_folder
-    if dir_name is None:
-        dir_name = os.path.join(parquet_folder_path, "merged")
-    os.makedirs(dir_name, exist_ok=True)
-    data_loader = DataLoader(sample)
-    parquet_groups = data_loader.parquet_split_groups(n_events_per_group=batch_size)
+    to_merge_dir = out_folder
+    if to_merge_dir is None:
+        to_merge_dir = sample.get_expected_parquet_folder_path() 
+    merge_out_folder = os.path.join(to_merge_dir, "..", "merged")
+    os.makedirs(merge_out_folder, exist_ok=False)
+    data_loader = DataLoader(None)
+    parquet_utils = ParquetUtils(to_merge_dir)
+    parquet_groups = parquet_utils.split_groups(n_events_per_group=batch_size)
     for i, pg in enumerate(parquet_groups):
         log_message("INFO", f"Merging group {i+1} of {len(parquet_groups)}")
-        array = data_loader.load(n_events=None, parquet_row_groups=pg)
-        out_path = os.path.join(dir_name, f"{sample_stub}.{i}.parquet")
+        array = data_loader.load_parquet(to_merge_dir, n_events=None, parquet_row_groups=pg)
+        out_path = os.path.join(merge_out_folder, f"{sample_stub}.{i}.parquet")
         ak.to_parquet(array, out_path, parquet_compliant_nested=True)
     ak.to_parquet_dataset(dir_name)
+
+    log_message("INFO", f"Merging successful, merged files are in {merge_out_folder}")
 
 
 
