@@ -10,10 +10,11 @@ hat-train:
   image: registry.cern.ch/atlas-ngt-wp21/train
   script:
     pwd
-    ls
+    ls -s /eos/project/
     source ~/.bashrc
     conda init
-    myenv    
+    myenv
+    
   
     
 #Stage where quantisation aware training optimises for physics performances
