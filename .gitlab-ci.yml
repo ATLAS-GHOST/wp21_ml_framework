@@ -6,7 +6,8 @@ hat-train:
   tags: [cern-nextgen-h100]
   image: registry.cern.ch/atlas-ngt-wp21/train
   script:
-    ls /workspace
+    echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
+    ls /eos/project-a/atlas-ngt-wp21/
     
 #Stage where quantisation aware training optimises for physics performances
 # qat-train:
