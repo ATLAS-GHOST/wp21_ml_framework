@@ -1,4 +1,4 @@
-stages: [hat-train, hat-split, qat-train, hls-convert, fw-build]
+stages: [hat-train, hat-split, qat-train, qat-split, hls-convert, fw-build]
 
 #Variables to link
 variables:
@@ -60,11 +60,11 @@ hat-split-4: { extends: .hat-split-template, variables: { IDX: "4" } }
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ln -s $EOS_SAMPLES/* $FILE
     - mkdir -p "$WORK_DIR"
-    - ln -s $PROJECT/* $WORK_DIR
+    - ln -s out/folder_$IDX $WORK_DIR
     - ls out/
     - source ~/.bashrc
     - myenv
-    - mkdir -p qat/$idx
+    - for sub in 0 1 2 3 4; do mkdir -p "qat/$IDX/qat_${sub}"; done
   artifacts:
     paths: ["qat/"]
     expire_in: 2 days
@@ -98,37 +98,101 @@ qat-4:
   needs: [{job: hat-split-4, artifacts: true}]
   dependencies: ["hat-split-4"]
   variables: { IDX: "4" }  
-  
-#Stage where quantisation aware training optimises for physics performances
-# qat-train:
-#   stage: qat-train
-#   tags: [cern-nextgen-h100]
-#   image: registry.cern.ch/atlas-ngt-wp21/train
-#   parallel: 5
-#   needs:
-#     - job: hat-train
-#       artifacts: true
-#   variables:
-#     QAT_IN_ROOT: "artifacts/hat"
-#     QAT_OUT_ROOT: "artifacts/qat"
-#   script: |
-#     echo "[qat-train] shard ${CI_NODE_INDEX}/${CI_NODE_TOTAL}"
-#     SHARD=$((CI_NODE_INDEX - 1))
-#     IN_DIR="${QAT_IN_ROOT}/folder_${SHARD}"
-#     OUT_DIR="${QAT_OUT_ROOT}/$dir_{SHARD}"
-#     test -d "${IN_DIR}" || { echo "Missing ${IN_DIR}" >&2; exit 2; }
-#     mkdir -p "${OUT_DIR}"
-#     ls ${QAT_OUT_ROOT}/
-#     source ~/.bashrc
-#     conda init
-#     conda activate myenv
-#     python --version    
-#   artifacts:
-#     when: on_success
-#     expire_in: 7 days
-#     paths:
-#       - artifacts/qat/
 
+.qat-split-template:
+  stage: qat-split
+  image: alpine:3.20
+  parallel:
+    matrix: [{ SUB: [0,1,2,3,4] }]
+  script:
+    - set -euo pipefail
+    - test -d "qat/$SLOT/qat_$SUB" || { echo "missing qat/$SLOT/qat_$SUB"; exit 1; }
+    - mkdir -p sel/"$SLOT"
+    - mv "qat/$SLOT/qat_$SUB" "sel/$SLOT/qat_$SUB"
+    - rm -rf qat || true
+    - mv sel qat
+    - ls -R qat
+  artifacts:
+    paths: ["qat/"]
+    expire_in: 2 days
+
+qat-split-0:
+  extends: .qat-split-template
+  needs: [{ job: qat-0, artifacts: true }]
+  dependencies: ["qat-0"]
+  variables: { SLOT: "0" }
+
+qat-split-1:
+  extends: .qat-split-template
+  needs: [{ job: qat-1, artifacts: true }]
+  dependencies: ["qat-1"]
+  variables: { SLOT: "1" }
+
+qat-split-2:
+  extends: .qat-split-template
+  needs: [{ job: qat-2, artifacts: true }]
+  dependencies: ["qat-2"]
+  variables: { SLOT: "2" }
+
+qat-split-3:
+  extends: .qat-split-template
+  needs: [{ job: qat-3, artifacts: true }]
+  dependencies: ["qat-3"]
+  variables: { SLOT: "3" }
+
+qat-split-4:
+  extends: .qat-split-template
+  needs: [{ job: qat-4, artifacts: true }]
+  dependencies: ["qat-4"]
+  variables: { SLOT: "4" }
+
+.hls-template:
+  stage: hls-convert
+  tags: [cern-nextgen-mi300x]
+  image: registry.cern.ch/atlas-ngt-wp21/hls4ml_only
+  script:
+    - set -euo pipefail
+    - test -d "qat/$SLOT/qat_$SUB" || { echo "missing qat/$SLOT/qat_$SUB"; exit 1; }
+    - mkdir -p "hls/$SLOT/hls_$SUB"
+  artifacts:
+    paths: ["hls/$SLOT/hls_$SUB"]
+    expire_in: 2 days
+
+hls-0:
+  extends: .hls-template
+  parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
+  variables: { SLOT: "0" }
+  needs: [{ job: "qat-split-0 [SUB=$SUB]", artifacts: true }]
+  dependencies: ["qat-split-0 [SUB=$SUB]"]
+
+hls-1:
+  extends: .hls-template
+  parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
+  variables: { SLOT: "1" }
+  needs: [{ job: "qat-split-1 [SUB=$SUB]", artifacts: true }]
+  dependencies: ["qat-split-1 [SUB=$SUB]"]
+
+hls-2:
+  extends: .hls-template
+  parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
+  variables: { SLOT: "2" }
+  needs: [{ job: "qat-split-2 [SUB=$SUB]", artifacts: true }]
+  dependencies: ["qat-split-2 [SUB=$SUB]"]
+
+hls-3:
+  extends: .hls-template
+  parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
+  variables: { SLOT: "3" }
+  needs: [{ job: "qat-split-3 [SUB=$SUB]", artifacts: true }]
+  dependencies: ["qat-split-3 [SUB=$SUB]"]
+
+hls-4:
+  extends: .hls-template
+  parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
+  variables: { SLOT: "4" }
+  needs: [{ job: "qat-split-4 [SUB=$SUB]", artifacts: true }]
+  dependencies: ["qat-split-4 [SUB=$SUB]"]
+  
 # #Conversion of model into HLS code for synthesis
 # hls-convert:
 #   stage: hls-convert
