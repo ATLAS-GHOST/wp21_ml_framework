@@ -57,7 +57,7 @@ hat-split-4: { extends: .hat-split-template, variables: { IDX: "4" } }
   tags: [cern-nextgen-h100]
   image: registry.cern.ch/atlas-ngt-wp21/train
   script:
-    - echo "EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
+    - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ln -s $EOS_SAMPLES/* $FILE
     - mkdir -p "$WORK_DIR"
     - ln -s $PROJECT/* WORK_DIR
