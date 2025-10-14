@@ -15,10 +15,11 @@ hat-train:
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ln -s $EOS_SAMPLES/* $FILE
-    - ls /workspace/samples/
     - mkdir -p "$WORK_DIR"
-    - ln -s "$PROJECT" "$WORK_DIR"
-    - ls /workspace/workDir
+    - ln -s $PROJECT/* $WORK_DIR
+    - source ~/.bashrc
+    - myenv
+    - python --version
     
 #Stage where quantisation aware training optimises for physics performances
 # qat-train:
