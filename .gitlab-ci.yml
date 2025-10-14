@@ -29,6 +29,29 @@ hat-train:
     paths: [out/]
     expire_in: 2 days
 
+.hat-split-template:
+  stage: hat-split
+  image: alpine:3.20
+  needs: ['hat-train']
+  dependencies: ['hat-train']
+  script:
+    - set -euo pipefail
+    - idx="$IDX"
+    - test -d "out/folder_$idx" || { echo "missing out/folder_$idx"; exit 1; }
+    - mkdir -p sel $$ mv "out/folder_$idx" "sel/folder_$idx"
+    - rm -rf out || true
+    - mv sel out
+    - ls -R out
+  artifacts:
+    paths: ["out/"]
+    expire_in: 2 days
+
+hat-split-0: { extends: .hat-split-template, variables: { IDX: "0" } }
+hat-split-1: { extends: .hat-split-template, variables: { IDX: "1" } }
+hat-split-2: { extends: .hat-split-template, variables: { IDX: "2" } }
+hat-split-3: { extends: .hat-split-template, variables: { IDX: "3" } }
+hat-split-4: { extends: .hat-split-template, variables: { IDX: "4" } }
+    
 .qat-template:
   stage: qat-train
   tags: [cern-nextgen-h100]
@@ -47,34 +70,33 @@ hat-train:
 
 qat-0:
   extends: .qat-template
-  needs: [{job: hat-stage, artifacts: true}]
-  dependencies: ["hat-stage"]
+  needs: [{job: hat-split-0, artifacts: true}]
+  dependencies: ["hat-split-0"]
   variables: { IDX: "0" }
     
 qat-1:
   extends: .qat-template
-  needs: [{job: hat-stage, artifacts: true}]
-  dependencies: ["hat-stage"]
+  needs: [{job: hat-split-1, artifacts: true}]
+  dependencies: ["hat-split-1"]
   variables: { IDX: "1" }
 
 qat-2:
   extends: .qat-template
-  needs: [{job: hat-stage, artifacts: true}]
-  dependencies: ["hat-stage"]
+  needs: [{job: hat-split-2, artifacts: true}]
+  dependencies: ["hat-split-2"]
   variables: { IDX: "2" }
 
 qat-3:
   extends: .qat-template
-  needs: [{job: hat-stage, artifacts: true}]
-  dependencies: ["hat-stage"]
+  needs: [{job: hat-split-3, artifacts: true}]
+  dependencies: ["hat-split-3"]
   variables: { IDX: "3" }
 
 qat-4:
   extends: .qat-template
-  needs: [{job: hat-stage, artifacts: true}]
-  dependencies: ["hat-stage"]
-  variables: { IDX: "4" }
-  
+  needs: [{job: hat-split-4, artifacts: true}]
+  dependencies: ["hat-split-4"]
+  variables: { IDX: "4" }  
   
 #Stage where quantisation aware training optimises for physics performances
 # qat-train:
