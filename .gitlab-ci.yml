@@ -14,11 +14,11 @@ hat-train:
   image: registry.cern.ch/atlas-ngt-wp21/train
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
-    - ls "$EOS_SAMPLES"
     - ln -s "$EOS_SAMPLES" "$FILE"
     - ls /workspace/samples/
     - mkdir -p "$WORK_DIR"
-    - ls "/workspace"
+    - ln -s "$PROJECT" "$WORK_DIR"
+    - ls /workspace/workDir
     
 #Stage where quantisation aware training optimises for physics performances
 # qat-train:
