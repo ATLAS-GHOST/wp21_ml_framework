@@ -60,7 +60,8 @@ hat-split-4: { extends: .hat-split-template, variables: { IDX: "4" } }
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ln -s $EOS_SAMPLES/* $FILE
     - mkdir -p "$WORK_DIR"
-    - ln -s $PROJECT/* WORK_DIR
+    - ln -s $PROJECT/* $WORK_DIR
+    - ls out/
     - source ~/.bashrc
     - myenv
     - mkdir -p qat/$idx
