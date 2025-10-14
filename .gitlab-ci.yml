@@ -2,8 +2,8 @@ stages: [hat-train, qat-train, hls-convert, fw-build]
 
 #Variables to link
 variables:
-  EOS_SAMPLES: "/eos/project-a/atlas-ngt-wp21/*"
-  FILE: "/workspace/samples/"
+  EOS_SAMPLES: "/eos/project-a/atlas-ngt-wp21"
+  FILE: "/workspace/samples"
   WORK_DIR: "/workspace/workDir"
   PROJECT: "$CI_PROJECT_DIR" #Change to project folder (as sub-module)  
 
@@ -15,7 +15,7 @@ hat-train:
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ln -s "$EOS_SAMPLES" "$FILE"
-    - ls "$FILE"
+    - ls /workspace/samples/
     - mkdir -p "$WORK_DIR"
     - ls "/workspace"
     
