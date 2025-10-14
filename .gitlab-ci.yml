@@ -9,11 +9,11 @@ hat-train:
   tags: [cern-nextgen-h100]
   image: registry.cern.ch/atlas-ngt-wp21/train
   script:
-    pwd
-    ls -s /eos/project/
-    source ~/.bashrc
-    conda init
-    myenv
+    #pwd
+    ls /eos/project/
+    #source ~/.bashrc
+    #conda init
+    #myenv
     
   
     
