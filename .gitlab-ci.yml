@@ -18,7 +18,7 @@ hat-train:
     - mkdir -p "$WORK_DIR"
     - ln -s $PROJECT/* $WORK_DIR
     - source ~/.bashrc
-    - myenv
+    - conda activate myenv
     - python --version
     
 #Stage where quantisation aware training optimises for physics performances
