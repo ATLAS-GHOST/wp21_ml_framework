@@ -15,7 +15,7 @@ hat-train:
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ls "$EOS_SAMPLES"
-    - ln -s "$EOS_SAMPLES/*" "$FILE/"
+    - ln -s "$EOS_SAMPLES" "$FILE"
     - ls /workspace/samples/
     - mkdir -p "$WORK_DIR"
     - ls "/workspace"
