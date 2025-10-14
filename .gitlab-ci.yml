@@ -162,36 +162,31 @@ hls-0:
   extends: .hls-template
   parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
   variables: { SLOT: "0" }
-  needs: [{ job: "qat-split-0 [SUB=$SUB]", artifacts: true }]
-  dependencies: ["qat-split-0 [SUB=$SUB]"]
+  needs: [{ job: "qat-split-0", artifacts: true }]
 
 hls-1:
   extends: .hls-template
   parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
   variables: { SLOT: "1" }
-  needs: [{ job: "qat-split-1 [SUB=$SUB]", artifacts: true }]
-  dependencies: ["qat-split-1 [SUB=$SUB]"]
+  needs: [{ job: "qat-split-1", artifacts: true }]
 
 hls-2:
   extends: .hls-template
   parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
   variables: { SLOT: "2" }
-  needs: [{ job: "qat-split-2 [SUB=$SUB]", artifacts: true }]
-  dependencies: ["qat-split-2 [SUB=$SUB]"]
+  needs: [{ job: "qat-split-2", artifacts: true }]
 
 hls-3:
   extends: .hls-template
   parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
   variables: { SLOT: "3" }
-  needs: [{ job: "qat-split-3 [SUB=$SUB]", artifacts: true }]
-  dependencies: ["qat-split-3 [SUB=$SUB]"]
+  needs: [{ job: "qat-split-3", artifacts: true }]
 
 hls-4:
   extends: .hls-template
   parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
   variables: { SLOT: "4" }
-  needs: [{ job: "qat-split-4 [SUB=$SUB]", artifacts: true }]
-  dependencies: ["qat-split-4 [SUB=$SUB]"]
+  needs: [{ job: "qat-split-4", artifacts: true }]
   
 # #Conversion of model into HLS code for synthesis
 # hls-convert:
