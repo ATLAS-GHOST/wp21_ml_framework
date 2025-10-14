@@ -4,12 +4,9 @@ stages: [hat-train, qat-train, hls-convert, fw-build]
 hat-train:
   stage: hat-train
   tags: [cern-nextgen-h100]
-  image: docker:27
-    #registry.cern.ch/atlas-ngt-wp21/train
+  image: registry.cern.ch/atlas-ngt-wp21/train
   script:
-    docker run -v /eos/project:/workspace/samples
-    ls /workspace/samples
-  
+    ls /workspace
     
 #Stage where quantisation aware training optimises for physics performances
 # qat-train:
