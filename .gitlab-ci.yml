@@ -1,4 +1,4 @@
-stages: [hat-train, qat-train, hls-convert, fw-build]
+stages: [hat-train, hat-split, qat-train, hls-convert, fw-build]
 
 #Variables to link
 variables:
