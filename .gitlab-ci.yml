@@ -5,7 +5,12 @@ variables:
   EOS_SAMPLES: "/eos/project-a/atlas-ngt-wp21/samples/GlobalSamples/merged"
   FILE: "/workspace/samples"
   WORK_DIR: "/workspace/workDir"
-  PROJECT: "$CI_PROJECT_DIR" #Change to project folder (as sub-module)  
+  PROJECT: "$CI_PROJECT_DIR" #Change to project folder (as sub-module)
+
+#Helper definition
+default:
+  before_script:
+    - alias myenv='conda activate myenv'
 
 #Stage where the model is optimised against hyper-parameters
 hat-train:
@@ -18,7 +23,8 @@ hat-train:
     - mkdir -p "$WORK_DIR"
     - ln -s $PROJECT/* $WORK_DIR
     - source ~/.bashrc
-    - conda activate myenv
+    - python --version
+    - myenv
     - python --version
     
 #Stage where quantisation aware training optimises for physics performances
