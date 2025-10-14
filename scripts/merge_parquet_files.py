@@ -15,7 +15,7 @@ if __name__ == "__main__":
     parser.add_argument("sample_folder", type=str, help="Path to the sample folder")
     parser.add_argument("--out_folder", type=str, default=None, help="Output folder for merged parquet files")
     parser.add_argument(
-        "--batch-size", type=int, default=100_000,
+        "--batch-size", type=int, default=100_000_000,
         help="Number of events per group (default: 100000)"
     )
 
