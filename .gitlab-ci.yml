@@ -14,7 +14,7 @@ hat-train:
   image: registry.cern.ch/atlas-ngt-wp21/train
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
-    - ln -s "$EOS_SAMPLES" "$FILE"
+    - ln -s $EOS_SAMPLES/* $FILE
     - ls /workspace/samples/
     - mkdir -p "$WORK_DIR"
     - ln -s "$PROJECT" "$WORK_DIR"
