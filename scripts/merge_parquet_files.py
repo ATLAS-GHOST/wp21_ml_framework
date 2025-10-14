@@ -43,7 +43,7 @@ if __name__ == "__main__":
         ak.to_parquet(array, out_path, parquet_compliant_nested=True)
     ak.to_parquet_dataset(merge_out_folder)
 
-    log_message("INFO", f"Merging successful, merged files are in {merge_out_folder}")
+    log_message("INFO", f"Merging successful, merged files are in {os.path.normpath(merge_out_folder)}")
 
 
 
