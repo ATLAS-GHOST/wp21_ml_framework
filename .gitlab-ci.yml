@@ -1,20 +1,14 @@
 stages: [hat-train, qat-train, hls-convert, fw-build]
 
-variables:
-  GIT_CLONE_PATH: "$CI_BUILDS_DIR/workspace/workDir"
-
 #Stage where the model is optimised against hyper-parameters
 hat-train:
   stage: hat-train
   tags: [cern-nextgen-h100]
-  image: registry.cern.ch/atlas-ngt-wp21/train
+  image: docker:27
+    #registry.cern.ch/atlas-ngt-wp21/train
   script:
-    #pwd
-    ls /eos/project/
-    #source ~/.bashrc
-    #conda init
-    #myenv
-    
+    docker run -v /eos/project:/workspace/samples
+    ls /workspace/samples
   
     
 #Stage where quantisation aware training optimises for physics performances
