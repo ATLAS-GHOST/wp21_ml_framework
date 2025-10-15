@@ -1,6 +1,6 @@
 #YML file for QAT stage
 
-qat-train:
+.qat-train:
   stage: qat-train
   extends: .common-train
   script:
@@ -12,14 +12,14 @@ qat-train:
     - myenv
     - for sub in 0 1 2 3 4; do mkdir -p "qat/hat_$IDX/qat_${sub}"; done
   artifacts:
-    paths: [out/]
+    paths: [qat/]
     expire_in: 2 days
 
-qat-0: { extends: qat-train, needs: [{job: hat-split-0, artifacts: true}], variables: { IDX: "0" } }
-qat-1: { extends: qat-train, needs: [{job: hat-split-1, artifacts: true}], variables: { IDX: "1" } }
-qat-2: { extends: qat-train, needs: [{job: hat-split-2, artifacts: true}], variables: { IDX: "2" } }
-qat-3: { extends: qat-train, needs: [{job: hat-split-3, artifacts: true}], variables: { IDX: "3" } }
-qat-4: { extends: qat-train, needs: [{job: hat-split-4, artifacts: true}], variables: { IDX: "4" } }
+qat-0: { extends: .qat-train, needs: [{job: hat-split-0, artifacts: true}], variables: { IDX: "0" } }
+qat-1: { extends: .qat-train, needs: [{job: hat-split-1, artifacts: true}], variables: { IDX: "1" } }
+qat-2: { extends: .qat-train, needs: [{job: hat-split-2, artifacts: true}], variables: { IDX: "2" } }
+qat-3: { extends: .qat-train, needs: [{job: hat-split-3, artifacts: true}], variables: { IDX: "3" } }
+qat-4: { extends: .qat-train, needs: [{job: hat-split-4, artifacts: true}], variables: { IDX: "4" } }
 
 .qat-split:
   stage: qat-split

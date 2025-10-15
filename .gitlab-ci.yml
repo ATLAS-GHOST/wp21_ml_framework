@@ -16,6 +16,7 @@ include:
   - local: 'ci/_shared.yml'
   - local: 'ci/hat.yml'
   - local: 'ci/qat.yml'
+  - local: 'ci/hls.yml'
     
 # .qat-template:
 #   stage: qat-train
