@@ -3,6 +3,7 @@
 hat-train:
   stage: hat-train
   extends: .common-train
+  needs: [setup-ci]
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ln -s $EOS_SAMPLES/* $FILE
@@ -11,7 +12,6 @@ hat-train:
     - source ~/.bashrc
     - myenv
     - mkdir -p out/hat_{0,1,2,3,4}
-    - mkdir -p $META_PATH
     - touch $META_PATH/my_file.txt
     - ls $META_PATH    
   artifacts:

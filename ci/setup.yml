@@ -1,0 +1,8 @@
+#YML file for setting up paths
+
+setup:
+  stage: setup-ci
+  extends: .common-small
+  script:
+    - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
+    - mkdir -p $META_PATH

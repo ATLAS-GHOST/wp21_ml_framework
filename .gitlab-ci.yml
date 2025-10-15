@@ -1,4 +1,4 @@
-stages: [hat-train, hat-split, qat-train, qat-split, hls-convert, fw-build]
+stages: [setup-ci, hat-train, hat-split, qat-train, qat-split, hls-convert, fw-build]
 
 #Variables to link
 variables:
@@ -6,7 +6,7 @@ variables:
   FILE: "/workspace/samples"
   WORK_DIR: "/workspace/workDir"
   PROJECT: "$CI_PROJECT_DIR" #Change to project folder (as sub-module)
-  META_PATH: "/eos/project/a/atlas-ngt-wp21/$GITLAB_USER_LOGIN/$CI_COMMIT_SHA/"
+  META_PATH: "/eos/project/a/atlas-ngt-wp21/meta-data/$GITLAB_USER_LOGIN/$CI_COMMIT_SHA/"
 
 #Helper definition
 default:
@@ -16,6 +16,7 @@ default:
 #Stage file inclusion
 include:
   - local: 'ci/_shared.yml'
+  - local: 'ci/setup.yml'
   - local: 'ci/hat.yml'
   #- local: 'ci/qat.yml'
   #- local: 'ci/hls.yml'
