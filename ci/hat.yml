@@ -4,7 +4,7 @@ hat-train:
   stage: hat-train
   extends: .common-train
   needs:
-    - job: setup-ci
+    - job: setup-stage
       artifacts: true
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
