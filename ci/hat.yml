@@ -1,0 +1,35 @@
+#YML file for HAT stage
+
+hat-train:
+  stage: hat-train
+  extends: .common-train
+  script:
+    - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
+    - ln -s $EOS_SAMPLES/* $FILE
+    - mkdir -p "$FILE" "$WORK_DIR"
+    - ln -s $PROJECT/* $WORK_DIR
+    - source ~/.bashrc
+    - myenv
+    - mkdir -p out/hat_{0,1,2,3,4}
+  artifacts:
+    paths: [out/]
+    expire_in: 2 days
+
+.hat-split:
+  stage: hat-split
+  extends: .common-small
+  script:
+    - set -euo pipefail
+    - idx=$IDX
+    - test -d "out/hat_$idx" || { echo "missing out/hat_$idx"; exit 1; }
+    - mkdir -p sel $$ mv "out/hat_$idx" "sel/hat_$idx"
+    - rm -rf out && mv sel out
+    - ls -R out
+  artifacts:{ paths: ["out/"], expire_in: 2 days }
+
+hat-split-0: { extends: .hat-split, needs: [hat-train], variables: { IDX: "0" } }
+hat-split-1: { extends: .hat-split, needs: [hat-train], variables: { IDX: "1" } }
+hat-split-2: { extends: .hat-split, needs: [hat-train], variables: { IDX: "2" } }
+hat-split-3: { extends: .hat-split, needs: [hat-train], variables: { IDX: "3" } }
+hat-split-4: { extends: .hat-split, needs: [hat-train], variables: { IDX: "4" } }
+

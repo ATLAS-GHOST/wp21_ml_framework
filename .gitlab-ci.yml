@@ -14,45 +14,46 @@ default:
 
 include:
   - local: 'ci/_shared.yml'
+  - local: 'ci/hat.yml'
 
 #Stage where the model is optimised against hyper-parameters
-hat-train:
-  stage: hat-train
-  extends: .common-train
-  script:
-    - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
-    - ln -s $EOS_SAMPLES/* $FILE
-    - mkdir -p "$WORK_DIR"
-    - ln -s $PROJECT/* $WORK_DIR
-    - source ~/.bashrc
-    - myenv
-    - mkdir -p out/folder_0 out/folder_1 out/folder_2 out/folder_3 out/folder_4
-  artifacts:
-    paths: [out/]
-    expire_in: 2 days
+# hat-train:
+#   stage: hat-train
+#   extends: .common-train
+#   script:
+#     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
+#     - ln -s $EOS_SAMPLES/* $FILE
+#     - mkdir -p "$WORK_DIR"
+#     - ln -s $PROJECT/* $WORK_DIR
+#     - source ~/.bashrc
+#     - myenv
+#     - mkdir -p out/folder_0 out/folder_1 out/folder_2 out/folder_3 out/folder_4
+#   artifacts:
+#     paths: [out/]
+#     expire_in: 2 days
 
-.hat-split-template:
-  stage: hat-split
-  extends: .common-small
-  needs: ['hat-train']
-  dependencies: ['hat-train']
-  script:
-    - set -euo pipefail
-    - idx="$IDX"
-    - test -d "out/folder_$idx" || { echo "missing out/folder_$idx"; exit 1; }
-    - mkdir -p sel $$ mv "out/folder_$idx" "sel/folder_$idx"
-    - rm -rf out || true
-    - mv sel out
-    - ls -R out
-  artifacts:
-    paths: ["out/"]
-    expire_in: 2 days
+# .hat-split-template:
+#   stage: hat-split
+#   extends: .common-small
+#   needs: ['hat-train']
+#   dependencies: ['hat-train']
+#   script:
+#     - set -euo pipefail
+#     - idx="$IDX"
+#     - test -d "out/folder_$idx" || { echo "missing out/folder_$idx"; exit 1; }
+#     - mkdir -p sel $$ mv "out/folder_$idx" "sel/folder_$idx"
+#     - rm -rf out || true
+#     - mv sel out
+#     - ls -R out
+#   artifacts:
+#     paths: ["out/"]
+#     expire_in: 2 days
 
-hat-split-0: { extends: .hat-split-template, variables: { IDX: "0" } }
-hat-split-1: { extends: .hat-split-template, variables: { IDX: "1" } }
-hat-split-2: { extends: .hat-split-template, variables: { IDX: "2" } }
-hat-split-3: { extends: .hat-split-template, variables: { IDX: "3" } }
-hat-split-4: { extends: .hat-split-template, variables: { IDX: "4" } }
+# hat-split-0: { extends: .hat-split-template, variables: { IDX: "0" } }
+# hat-split-1: { extends: .hat-split-template, variables: { IDX: "1" } }
+# hat-split-2: { extends: .hat-split-template, variables: { IDX: "2" } }
+# hat-split-3: { extends: .hat-split-template, variables: { IDX: "3" } }
+# hat-split-4: { extends: .hat-split-template, variables: { IDX: "4" } }
     
 .qat-template:
   stage: qat-train
