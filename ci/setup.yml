@@ -1,6 +1,6 @@
 #YML file for setting up paths
 
-setup:
+setup-stage:
   stage: setup-ci
   extends: .common-small
   script:
