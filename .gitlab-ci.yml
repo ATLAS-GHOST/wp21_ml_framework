@@ -6,17 +6,19 @@ variables:
   FILE: "/workspace/samples"
   WORK_DIR: "/workspace/workDir"
   PROJECT: "$CI_PROJECT_DIR" #Change to project folder (as sub-module)
+  META_PATH: "/eos/project/a/atlas-ngt-wp21/$GITLAB_USER_LOGIN/$CI_COMMIT_SHA/"
 
 #Helper definition
 default:
   before_script:
     - myenv() { conda activate myenv; }
+    - mkdir -p $META_PATH
 
 #Stage file inclusion
 include:
   - local: 'ci/_shared.yml'
   - local: 'ci/hat.yml'
-  - local: 'ci/qat.yml'
-  - local: 'ci/hls.yml'
-  - local: 'ci/fw.yml'    
+  #- local: 'ci/qat.yml'
+  #- local: 'ci/hls.yml'
+  #- local: 'ci/fw.yml'    
 
