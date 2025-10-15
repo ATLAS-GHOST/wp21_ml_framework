@@ -1,0 +1,67 @@
+#YML file for QAT stage
+
+qat-train:
+  stage: qat-train
+  extends: .common-train
+  script:
+    - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
+    - mkdir -p "$FILE" "$WORK_DIR"
+    - ln -s out/hat_$IDX $WORK_DIR
+    - ls out/
+    - source ~/.bashrc
+    - myenv
+    - for sub in 0 1 2 3 4; do mkdir -p "qat/hat_$IDX/qat_${sub}"; done
+  artifacts:
+    paths: [out/]
+    expire_in: 2 days
+
+qat-0: { extends: qat-train, needs: [{job: hat-split-0, artifacts: true}], variables: { IDX: "0" } }
+qat-1: { extends: qat-train, needs: [{job: hat-split-1, artifacts: true}], variables: { IDX: "1" } }
+qat-2: { extends: qat-train, needs: [{job: hat-split-2, artifacts: true}], variables: { IDX: "2" } }
+qat-3: { extends: qat-train, needs: [{job: hat-split-3, artifacts: true}], variables: { IDX: "3" } }
+qat-4: { extends: qat-train, needs: [{job: hat-split-4, artifacts: true}], variables: { IDX: "4" } }
+
+.qat-split:
+  stage: qat-split
+  extends: .common-small
+  script:
+    - set -euo pipefail
+    - test -d "qat/hat_$SLOT/qat_$SUB" || { echo "missing qat/hat_$SLOT/qat_$SUB"; exit 1; }
+    - mkdir -p sel/hat_"$SLOT" && mv "qat/hat_$SLOT/qat_$SUB" "sel/hat_$SLOT/qat_$SUB"
+    - rm -rf qat && mv sel qat
+  artifacts: { paths: ["qat/"], expire_in: 2 days }
+
+# Pipeline-0
+qat-split-0-0: { extends: .qat-split, needs: [{job: qat-0, artifacts: true}], variables: { SLOT: "0", SUB: "0" } }
+qat-split-0-1: { extends: .qat-split, needs: [{job: qat-0, artifacts: true}], variables: { SLOT: "0", SUB: "1" } }
+qat-split-0-2: { extends: .qat-split, needs: [{job: qat-0, artifacts: true}], variables: { SLOT: "0", SUB: "2" } }
+qat-split-0-3: { extends: .qat-split, needs: [{job: qat-0, artifacts: true}], variables: { SLOT: "0", SUB: "3" } }
+qat-split-0-4: { extends: .qat-split, needs: [{job: qat-0, artifacts: true}], variables: { SLOT: "0", SUB: "4" } }
+
+# Pipeline-1
+qat-split-1-0: { extends: .qat-split, needs: [{job: qat-1, artifacts: true}], variables: { SLOT: "1", SUB: "0" } }
+qat-split-1-1: { extends: .qat-split, needs: [{job: qat-1, artifacts: true}], variables: { SLOT: "1", SUB: "1" } }
+qat-split-1-2: { extends: .qat-split, needs: [{job: qat-1, artifacts: true}], variables: { SLOT: "1", SUB: "2" } }
+qat-split-1-3: { extends: .qat-split, needs: [{job: qat-1, artifacts: true}], variables: { SLOT: "1", SUB: "3" } }
+qat-split-1-4: { extends: .qat-split, needs: [{job: qat-1, artifacts: true}], variables: { SLOT: "1", SUB: "4" } }
+
+# Pipeline-2
+qat-split-2-0: { extends: .qat-split, needs: [{job: qat-2, artifacts: true}], variables: { SLOT: "2", SUB: "0" } }
+qat-split-2-1: { extends: .qat-split, needs: [{job: qat-2, artifacts: true}], variables: { SLOT: "2", SUB: "1" } }
+qat-split-2-2: { extends: .qat-split, needs: [{job: qat-2, artifacts: true}], variables: { SLOT: "2", SUB: "2" } }
+qat-split-2-3: { extends: .qat-split, needs: [{job: qat-2, artifacts: true}], variables: { SLOT: "2", SUB: "3" } }
+qat-split-2-4: { extends: .qat-split, needs: [{job: qat-2, artifacts: true}], variables: { SLOT: "2", SUB: "4" } }
+
+# Pipeline-3
+qat-split-3-0: { extends: .qat-split, needs: [{job: qat-3, artifacts: true}], variables: { SLOT: "3", SUB: "0" } }
+qat-split-3-1: { extends: .qat-split, needs: [{job: qat-3, artifacts: true}], variables: { SLOT: "3", SUB: "1" } }
+qat-split-3-2: { extends: .qat-split, needs: [{job: qat-3, artifacts: true}], variables: { SLOT: "3", SUB: "2" } }
+qat-split-3-3: { extends: .qat-split, needs: [{job: qat-3, artifacts: true}], variables: { SLOT: "3", SUB: "3" } }
+qat-split-3-4: { extends: .qat-split, needs: [{job: qat-3, artifacts: true}], variables: { SLOT: "3", SUB: "4" } }
+
+# Pipeline-4
+qat-split-4-0: { extends: .qat-split, needs: [{job: qat-4, artifacts: true}], variables: { SLOT: "4", SUB: "0" } }
+qat-split-4-1: { extends: .qat-split, needs: [{job: qat-4, artifacts: true}], variables: { SLOT: "4", SUB: "1" } }
+qat-split-4-2: { extends: .qat-split, needs: [{job: qat-4, artifacts: true}], variables: { SLOT: "4", SUB: "2" } }
+qat-split-4-3: { extends: .qat-split, needs: [{job: qat-4, artifacts: true}], variables: { SLOT: "4", SUB: "3" } }
+qat-split-4-4: { extends: .qat-split, needs: [{job: qat-4, artifacts: true}], variables: { SLOT: "4", SUB: "4" } }

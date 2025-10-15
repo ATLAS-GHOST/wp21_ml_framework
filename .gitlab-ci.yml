@@ -15,179 +15,141 @@ default:
 include:
   - local: 'ci/_shared.yml'
   - local: 'ci/hat.yml'
-
-#Stage where the model is optimised against hyper-parameters
-# hat-train:
-#   stage: hat-train
+  - local: 'ci/qat.yml'
+    
+# .qat-template:
+#   stage: qat-train
 #   extends: .common-train
 #   script:
 #     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
 #     - ln -s $EOS_SAMPLES/* $FILE
 #     - mkdir -p "$WORK_DIR"
-#     - ln -s $PROJECT/* $WORK_DIR
+#     - ln -s out/folder_$IDX $WORK_DIR
+#     - ls out/
 #     - source ~/.bashrc
 #     - myenv
-#     - mkdir -p out/folder_0 out/folder_1 out/folder_2 out/folder_3 out/folder_4
+#     - for sub in 0 1 2 3 4; do mkdir -p "qat/$IDX/qat_${sub}"; done
 #   artifacts:
-#     paths: [out/]
+#     paths: ["qat/"]
 #     expire_in: 2 days
 
-# .hat-split-template:
-#   stage: hat-split
+# qat-0:
+#   extends: .qat-template
+#   needs: [{job: hat-split-0, artifacts: true}]
+#   dependencies: ["hat-split-0"]
+#   variables: { IDX: "0" }
+    
+# qat-1:
+#   extends: .qat-template
+#   needs: [{job: hat-split-1, artifacts: true}]
+#   dependencies: ["hat-split-1"]
+#   variables: { IDX: "1" }
+
+# qat-2:
+#   extends: .qat-template
+#   needs: [{job: hat-split-2, artifacts: true}]
+#   dependencies: ["hat-split-2"]
+#   variables: { IDX: "2" }
+
+# qat-3:
+#   extends: .qat-template
+#   needs: [{job: hat-split-3, artifacts: true}]
+#   dependencies: ["hat-split-3"]
+#   variables: { IDX: "3" }
+
+# qat-4:
+#   extends: .qat-template
+#   needs: [{job: hat-split-4, artifacts: true}]
+#   dependencies: ["hat-split-4"]
+#   variables: { IDX: "4" }  
+
+# .qat-split-template:
+#   stage: qat-split
 #   extends: .common-small
-#   needs: ['hat-train']
-#   dependencies: ['hat-train']
+#   parallel:
+#     matrix: [{ SUB: [0,1,2,3,4] }]
 #   script:
 #     - set -euo pipefail
-#     - idx="$IDX"
-#     - test -d "out/folder_$idx" || { echo "missing out/folder_$idx"; exit 1; }
-#     - mkdir -p sel $$ mv "out/folder_$idx" "sel/folder_$idx"
-#     - rm -rf out || true
-#     - mv sel out
-#     - ls -R out
+#     - test -d "qat/$SLOT/qat_$SUB" || { echo "missing qat/$SLOT/qat_$SUB"; exit 1; }
+#     - mkdir -p sel/"$SLOT"
+#     - mv "qat/$SLOT/qat_$SUB" "sel/$SLOT/qat_$SUB"
+#     - rm -rf qat || true
+#     - mv sel qat
+#     - ls -R qat
 #   artifacts:
-#     paths: ["out/"]
+#     paths: ["qat/"]
 #     expire_in: 2 days
 
-# hat-split-0: { extends: .hat-split-template, variables: { IDX: "0" } }
-# hat-split-1: { extends: .hat-split-template, variables: { IDX: "1" } }
-# hat-split-2: { extends: .hat-split-template, variables: { IDX: "2" } }
-# hat-split-3: { extends: .hat-split-template, variables: { IDX: "3" } }
-# hat-split-4: { extends: .hat-split-template, variables: { IDX: "4" } }
-    
-.qat-template:
-  stage: qat-train
-  extends: .common-train
-  script:
-    - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
-    - ln -s $EOS_SAMPLES/* $FILE
-    - mkdir -p "$WORK_DIR"
-    - ln -s out/folder_$IDX $WORK_DIR
-    - ls out/
-    - source ~/.bashrc
-    - myenv
-    - for sub in 0 1 2 3 4; do mkdir -p "qat/$IDX/qat_${sub}"; done
-  artifacts:
-    paths: ["qat/"]
-    expire_in: 2 days
+# qat-split-0:
+#   extends: .qat-split-template
+#   needs: [{ job: qat-0, artifacts: true }]
+#   dependencies: ["qat-0"]
+#   variables: { SLOT: "0" }
 
-qat-0:
-  extends: .qat-template
-  needs: [{job: hat-split-0, artifacts: true}]
-  dependencies: ["hat-split-0"]
-  variables: { IDX: "0" }
-    
-qat-1:
-  extends: .qat-template
-  needs: [{job: hat-split-1, artifacts: true}]
-  dependencies: ["hat-split-1"]
-  variables: { IDX: "1" }
+# qat-split-1:
+#   extends: .qat-split-template
+#   needs: [{ job: qat-1, artifacts: true }]
+#   dependencies: ["qat-1"]
+#   variables: { SLOT: "1" }
 
-qat-2:
-  extends: .qat-template
-  needs: [{job: hat-split-2, artifacts: true}]
-  dependencies: ["hat-split-2"]
-  variables: { IDX: "2" }
+# qat-split-2:
+#   extends: .qat-split-template
+#   needs: [{ job: qat-2, artifacts: true }]
+#   dependencies: ["qat-2"]
+#   variables: { SLOT: "2" }
 
-qat-3:
-  extends: .qat-template
-  needs: [{job: hat-split-3, artifacts: true}]
-  dependencies: ["hat-split-3"]
-  variables: { IDX: "3" }
+# qat-split-3:
+#   extends: .qat-split-template
+#   needs: [{ job: qat-3, artifacts: true }]
+#   dependencies: ["qat-3"]
+#   variables: { SLOT: "3" }
 
-qat-4:
-  extends: .qat-template
-  needs: [{job: hat-split-4, artifacts: true}]
-  dependencies: ["hat-split-4"]
-  variables: { IDX: "4" }  
+# qat-split-4:
+#   extends: .qat-split-template
+#   needs: [{ job: qat-4, artifacts: true }]
+#   dependencies: ["qat-4"]
+#   variables: { SLOT: "4" }
 
-.qat-split-template:
-  stage: qat-split
-  extends: .common-small
-  parallel:
-    matrix: [{ SUB: [0,1,2,3,4] }]
-  script:
-    - set -euo pipefail
-    - test -d "qat/$SLOT/qat_$SUB" || { echo "missing qat/$SLOT/qat_$SUB"; exit 1; }
-    - mkdir -p sel/"$SLOT"
-    - mv "qat/$SLOT/qat_$SUB" "sel/$SLOT/qat_$SUB"
-    - rm -rf qat || true
-    - mv sel qat
-    - ls -R qat
-  artifacts:
-    paths: ["qat/"]
-    expire_in: 2 days
+# .hls-template:
+#   stage: hls-convert
+#   extends: .common-hls
+#   script:
+#     - set -euo pipefail
+#     - test -d "qat/hat_$SLOT/qat_$SUB" || { echo "missing qat/hat_$SLOT/qat_$SUB"; exit 1; }
+#     - mkdir -p "hls/$SLOT/hls_$SUB"
+#   artifacts:
+#     paths: ["hls/qat_$SLOT/hls_$SUB"]
+#     expire_in: 2 days
 
-qat-split-0:
-  extends: .qat-split-template
-  needs: [{ job: qat-0, artifacts: true }]
-  dependencies: ["qat-0"]
-  variables: { SLOT: "0" }
+# hls-0:
+#   extends: .hls-template
+#   parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
+#   variables: { SLOT: "0" }
+#   needs: [{ job: "qat-split-0", artifacts: true }]
 
-qat-split-1:
-  extends: .qat-split-template
-  needs: [{ job: qat-1, artifacts: true }]
-  dependencies: ["qat-1"]
-  variables: { SLOT: "1" }
+# hls-1:
+#   extends: .hls-template
+#   parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
+#   variables: { SLOT: "1" }
+#   needs: [{ job: "qat-split-1", artifacts: true }]
 
-qat-split-2:
-  extends: .qat-split-template
-  needs: [{ job: qat-2, artifacts: true }]
-  dependencies: ["qat-2"]
-  variables: { SLOT: "2" }
+# hls-2:
+#   extends: .hls-template
+#   parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
+#   variables: { SLOT: "2" }
+#   needs: [{ job: "qat-split-2", artifacts: true }]
 
-qat-split-3:
-  extends: .qat-split-template
-  needs: [{ job: qat-3, artifacts: true }]
-  dependencies: ["qat-3"]
-  variables: { SLOT: "3" }
+# hls-3:
+#   extends: .hls-template
+#   parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
+#   variables: { SLOT: "3" }
+#   needs: [{ job: "qat-split-3", artifacts: true }]
 
-qat-split-4:
-  extends: .qat-split-template
-  needs: [{ job: qat-4, artifacts: true }]
-  dependencies: ["qat-4"]
-  variables: { SLOT: "4" }
-
-.hls-template:
-  stage: hls-convert
-  extends: .common-hls
-  script:
-    - set -euo pipefail
-    - test -d "qat/$SLOT/qat_$SUB" || { echo "missing qat/$SLOT/qat_$SUB"; exit 1; }
-    - mkdir -p "hls/$SLOT/hls_$SUB"
-  artifacts:
-    paths: ["hls/$SLOT/hls_$SUB"]
-    expire_in: 2 days
-
-hls-0:
-  extends: .hls-template
-  parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
-  variables: { SLOT: "0" }
-  needs: [{ job: "qat-split-0", artifacts: true }]
-
-hls-1:
-  extends: .hls-template
-  parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
-  variables: { SLOT: "1" }
-  needs: [{ job: "qat-split-1", artifacts: true }]
-
-hls-2:
-  extends: .hls-template
-  parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
-  variables: { SLOT: "2" }
-  needs: [{ job: "qat-split-2", artifacts: true }]
-
-hls-3:
-  extends: .hls-template
-  parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
-  variables: { SLOT: "3" }
-  needs: [{ job: "qat-split-3", artifacts: true }]
-
-hls-4:
-  extends: .hls-template
-  parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
-  variables: { SLOT: "4" }
-  needs: [{ job: "qat-split-4", artifacts: true }]
+# hls-4:
+#   extends: .hls-template
+#   parallel: { matrix: [{ SUB: [0,1,2,3,4] }] }
+#   variables: { SLOT: "4" }
+#   needs: [{ job: "qat-split-4", artifacts: true }]
   
 # #Firmware building (i.e. synthesis) - using CI4FPGA infrastructure
 # fw-build:
