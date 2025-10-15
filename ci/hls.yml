@@ -2,7 +2,7 @@
 
 .hls-convert:
   stage: hls-convert
-  image: .common-hls
+  extends: .common-hls
   script:
     - set -euo pipefail
     - test -d "qat/hat_$SLOT/qat_$SUB" || { echo "Missing qat/hat_$SLOT/qat_$SUB"; exit 1; }
