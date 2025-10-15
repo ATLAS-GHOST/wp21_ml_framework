@@ -12,11 +12,13 @@ default:
   before_script:
     - myenv() { conda activate myenv; }
 
+include:
+  - local: 'ci/_shared.yml'
+
 #Stage where the model is optimised against hyper-parameters
 hat-train:
   stage: hat-train
-  tags: [cern-nextgen-h100]
-  image: registry.cern.ch/atlas-ngt-wp21/train
+  extends: .common-train
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ln -s $EOS_SAMPLES/* $FILE
@@ -31,7 +33,7 @@ hat-train:
 
 .hat-split-template:
   stage: hat-split
-  image: alpine:3.20
+  extends: .common-small
   needs: ['hat-train']
   dependencies: ['hat-train']
   script:
@@ -54,8 +56,7 @@ hat-split-4: { extends: .hat-split-template, variables: { IDX: "4" } }
     
 .qat-template:
   stage: qat-train
-  tags: [cern-nextgen-h100]
-  image: registry.cern.ch/atlas-ngt-wp21/train
+  extends: .common-train
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ln -s $EOS_SAMPLES/* $FILE
@@ -101,7 +102,7 @@ qat-4:
 
 .qat-split-template:
   stage: qat-split
-  image: alpine:3.20
+  extends: .common-small
   parallel:
     matrix: [{ SUB: [0,1,2,3,4] }]
   script:
@@ -148,8 +149,7 @@ qat-split-4:
 
 .hls-template:
   stage: hls-convert
-  tags: [cern-nextgen-mi300x]
-  image: registry.cern.ch/atlas-ngt-wp21/hls4ml_only
+  extends: .common-hls
   script:
     - set -euo pipefail
     - test -d "qat/$SLOT/qat_$SUB" || { echo "missing qat/$SLOT/qat_$SUB"; exit 1; }
@@ -188,34 +188,6 @@ hls-4:
   variables: { SLOT: "4" }
   needs: [{ job: "qat-split-4", artifacts: true }]
   
-# #Conversion of model into HLS code for synthesis
-# hls-convert:
-#   stage: hls-convert
-#   tags: [cern-nextgen-mi300x]
-#   image: registry.cern.ch/atlas-ngt-wp21/hls4ml_only
-#   parallel: 5
-#   needs:
-#     - job: qat-train
-#       artifacts: true
-#   variables:
-#     HLT_OUT_ROOT: "artifacts/hls"
-#   script: |
-#     echo "[hls-convert] shard ${CI_NODE_INDEX}/${CI_NODE_TOTAL} using ${IN_DIR}"    
-#     SHARD=$((CI_NODE_INDEX - 1))
-#     IN_DIR="artifacts/qat/dir_${SHARD}"
-#     OUT_DIR="${HLS_OUT_ROOT}/dir_${SHARD}"
-#     test -d "${IN_DIR}" || { echo "Missing ${IN_DIR}" >&2; exit 2; }
-#     mkdir -p "${OUT_DIR}"
-#     source ~/.bashrc
-#     conda init
-#     conda activate myenv
-#     python --version    
-#   artifacts:
-#     when: on_success
-#     expire_in: 7 days
-#     paths:
-#       - artifacts/hls/
-
 # #Firmware building (i.e. synthesis) - using CI4FPGA infrastructure
 # fw-build:
 #   stage: fw-build
