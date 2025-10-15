@@ -12,7 +12,6 @@ variables:
 default:
   before_script:
     - myenv() { conda activate myenv; }
-    - mkdir -p $META_PATH
 
 #Stage file inclusion
 include:

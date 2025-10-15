@@ -11,6 +11,9 @@ hat-train:
     - source ~/.bashrc
     - myenv
     - mkdir -p out/hat_{0,1,2,3,4}
+    - mkdir -p $META_PATH
+    - touch $META_PATH/my_file.txt
+    - ls $META_PATH    
   artifacts:
     paths: [out/]
     expire_in: 2 days
