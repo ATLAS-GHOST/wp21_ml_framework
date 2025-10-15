@@ -25,7 +25,10 @@ hat-train:
     - mkdir -p sel $$ mv "out/hat_$idx" "sel/hat_$idx"
     - rm -rf out && mv sel out
     - ls -R out
-  artifacts:{ paths: ["out/"], expire_in: 2 days }
+  artifacts:
+    paths:
+      - out/
+    expire_in: 2 days
 
 hat-split-0: { extends: .hat-split, needs: [hat-train], variables: { IDX: "0" } }
 hat-split-1: { extends: .hat-split, needs: [hat-train], variables: { IDX: "1" } }
