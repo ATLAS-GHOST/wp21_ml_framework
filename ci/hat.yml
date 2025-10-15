@@ -3,7 +3,7 @@
 hat-train:
   stage: hat-train
   extends: .common-train
-  needs: [setup-ci]
+  needs: [{job: setup-ci}]
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ln -s $EOS_SAMPLES/* $FILE
