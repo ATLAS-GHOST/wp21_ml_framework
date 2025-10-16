@@ -7,13 +7,14 @@ variables:
   WORK_DIR: "/workspace/workDir"
   PROJECT: "$CI_PROJECT_DIR" #Change to project folder (as sub-module)
   META_PATH: "/eos/project/a/atlas-ngt-wp21/meta-data/$GITLAB_USER_LOGIN/$CI_COMMIT_SHA/"
+  GIT_SUBMODULE_STRATEGY: none
 
 #Helper definition
 default:
   before_script:
     - myenv() { conda activate myenv; }
-    - git submodule sync --recursive
-    - git submodule update --init --recursive
+    - git submodule sync --project
+    - git submodule update --init --depth 1 project
 
 #Stage file inclusion
 include:
