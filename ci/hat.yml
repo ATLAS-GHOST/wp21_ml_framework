@@ -14,6 +14,7 @@ hat-train:
     - ln -s $PROJECT/* $WORK_DIR
     - source ~/.bashrc
     - myenv
+    - python $WORK_DIR/train.py
     - mkdir -p out/hat_{0,1,2,3,4}
     - touch $META_PATH/my_file.txt
     - ls $META_PATH    
