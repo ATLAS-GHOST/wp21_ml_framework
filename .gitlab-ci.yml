@@ -13,6 +13,7 @@ variables:
 default:
   before_script:
     - myenv() { conda activate myenv; }
+    - git submodule set-url project "https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cern.ch/atlas-nextgen-wp21/dummy_ml_prj.git"
     - git submodule sync -- project
     - git submodule update --init --depth 1 project
 
