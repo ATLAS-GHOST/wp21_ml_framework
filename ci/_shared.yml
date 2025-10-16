@@ -2,7 +2,7 @@
 
 .common-train:
   image: registry.cern.ch/atlas-ngt-wp21/train
-  tags: [cern-nextgen-h100-4]
+  tags: [cern-nextgen-h100-2]
 
 .common-hls:
   image: registry.cern.ch/atlas-ngt-wp21/hls4ml_only
