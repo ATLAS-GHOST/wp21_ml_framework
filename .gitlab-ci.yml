@@ -12,13 +12,15 @@ variables:
 default:
   before_script:
     - myenv() { conda activate myenv; }
+    - git submodule sync --recursive
+    - git submodule update --init --recursive
 
 #Stage file inclusion
 include:
   - local: 'ci/_shared.yml'
   - local: 'ci/setup.yml'
   - local: 'ci/hat.yml'
-  - local: 'ci/qat.yml'
-  - local: 'ci/hls.yml'
-  - local: 'ci/fw.yml'    
+  #- local: 'ci/qat.yml'
+  #- local: 'ci/hls.yml'
+  #- local: 'ci/fw.yml'    
 

@@ -7,3 +7,7 @@
 [submodule "wp21_train"]
 	path = wp21_train
 	url = https://gitlab.cern.ch/atlas-nextgen-wp21/wp21_training_framework.git
+[submodule "project"]
+	path = project
+	url = https://gitlab.cern.ch/atlas-nextgen-wp21/dummy_ml_prj.git
+	branch = master
