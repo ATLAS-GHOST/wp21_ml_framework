@@ -13,7 +13,7 @@ variables:
 default:
   before_script:
     - myenv() { conda activate myenv; }
-    - git submodule sync --project
+    - git submodule sync -- project
     - git submodule update --init --depth 1 project
 
 #Stage file inclusion
