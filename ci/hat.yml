@@ -9,6 +9,7 @@ hat-train:
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ln -s $EOS_SAMPLES/* $FILE
+    - ls $PROJECT/project
     - mkdir -p "$FILE" "$WORK_DIR"
     - ln -s $PROJECT/* $WORK_DIR
     - source ~/.bashrc
