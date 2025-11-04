@@ -14,10 +14,8 @@ hat-train:
     - ln -s $PROJECT/* $WORK_DIR
     - source ~/.bashrc
     - myenv
-    - python $PROJECT/project/train.py
-    - mkdir -p out/hat_{0,1,2,3,4}
-    - touch $META_PATH/my_file.txt
-    - ls $META_PATH    
+    - mkdir out
+    - python $PROJECT/project/train.py -fin $PROJECT/project/config -fout out -meta $META_PATH
   artifacts:
     paths: [out/]
     expire_in: 2 days
@@ -28,8 +26,8 @@ hat-train:
   script:
     - set -euo pipefail
     - idx=$IDX
-    - test -d "out/hat_$idx" || { echo "missing out/hat_$idx"; exit 1; }
-    - mkdir -p sel $$ mv "out/hat_$idx" "sel/hat_$idx"
+    - test -f "out/config_$idx.json" || { echo "missing out/config_$idx.json"; exit 1; }
+    - mkdir -p sel && mv "out/config_$idx.json" "sel/config_$idx.json"
     - rm -rf out && mv sel out
     - ls -R out
   artifacts:
