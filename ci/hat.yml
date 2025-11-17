@@ -15,7 +15,7 @@ hat-train:
     - source ~/.bashrc
     - myenv
     - mkdir out
-    - python $PROJECT/project/train.py -fin $PROJECT/project/config -meta $META_PATH -fout ''
+    - python $PROJECT/project/train_physics.py -fin $PROJECT/project/config_physics -meta $META_PATH -fout ''
   artifacts:
     paths: [out/]
     expire_in: 2 days
