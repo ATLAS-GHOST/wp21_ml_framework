@@ -18,7 +18,7 @@ hat-train:
     - pip uninstall -y wp21_train
     - pip install wp21_train
     - mkdir out
-    - python $PROJECT/project/train_physics.py -fin $PROJECT/project/config_physics -meta $META_PATH -fout ''
+    - python $PROJECT/project/train_physics.py -fin $PROJECT/project/config_physics -meta $META_PATH -fout '' -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bkg 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight'
   artifacts:
     paths: [out/]
     expire_in: 2 days
