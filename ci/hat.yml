@@ -8,7 +8,6 @@ hat-train:
       artifacts: true
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
-    - ls $EOS_SAMPLES/
     - ln -s $EOS_SAMPLES/* $FILE
     - ls $PROJECT/project
     - mkdir -p "$FILE" "$WORK_DIR"

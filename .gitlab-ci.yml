@@ -2,7 +2,7 @@ stages: [setup-ci, hat-train, hat-split, qat-train, qat-split, hls-convert, fw-b
 
 #Variables to link
 variables:
-  EOS_SAMPLES: "/eos/project-a/atlas-ngt-wp21/samples/GlobalSamples/merged"
+  EOS_SAMPLES: "/eos/project-a/atlas-ngt-wp21/samples/GlobalSamples"
   FILE: "/workspace/samples"
   WORK_DIR: "/workspace/workDir"
   PROJECT: "$CI_PROJECT_DIR" #Change to project folder (as sub-module)
