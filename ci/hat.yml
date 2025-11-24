@@ -9,7 +9,7 @@ hat-train:
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ln -s $EOS_SAMPLES/* $FILE
-    - export LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
+    - export LD_LIBRARY_PATH=/usr/local/cuda/targets/x86_64-linux/lib:${LD_LIBRARY_PATH}
     - ls $PROJECT/project
     - mkdir -p "$FILE" "$WORK_DIR"
     - ln -s $PROJECT/* $WORK_DIR
