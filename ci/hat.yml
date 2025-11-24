@@ -9,6 +9,8 @@ hat-train:
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ln -s $EOS_SAMPLES/* $FILE
+    - locate libnvrtc.so
+    - find /usr -name "libnvrtc.so*" 2>/dev/null
     - export LD_LIBRARY_PATH=/usr/local/cuda/targets/x86_64-linux/lib:${LD_LIBRARY_PATH}
     - ls $PROJECT/project
     - mkdir -p "$FILE" "$WORK_DIR"
