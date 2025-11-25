@@ -38,6 +38,7 @@ hat-train:
   artifacts:
     paths:
       - out/
+      - $PROJECT/project
     expire_in: 2 days
 
 hat-split-0: { extends: .hat-split, needs: [hat-train], variables: { IDX: "0" } }
