@@ -32,7 +32,7 @@ hat-train:
     - set -euo pipefail
     - idx=$IDX
     - test -f "out/config_$idx.json" || { echo "missing out/config_$idx.json"; exit 1; }
-    - mkdir -p sel && mv "out/config_$idx.json" "sel/hat_$idx/config_$idx.json"
+    - mkdir -p "sel/hat_$idx" && mv "out/config_$idx.json" "sel/hat_$idx/config_$idx.json"
     - rm -rf out && mv sel out
     - ls -R out
   artifacts:
