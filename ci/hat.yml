@@ -22,7 +22,9 @@ hat-train:
     - mkdir out
     - python $PROJECT/project/train_physics.py -fin $PROJECT/project/config_physics -meta $META_PATH -fout '' -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bg 'Py8EG_A14NNPDF23LO_jj_JZ0' -type 'hat'
   artifacts:
-    paths: [out/]
+    paths:
+      - out/
+      - $PROJECT/project
     expire_in: 2 days
 
 .hat-split:
@@ -46,4 +48,3 @@ hat-split-1: { extends: .hat-split, needs: [hat-train], variables: { IDX: "1" } 
 hat-split-2: { extends: .hat-split, needs: [hat-train], variables: { IDX: "2" } }
 hat-split-3: { extends: .hat-split, needs: [hat-train], variables: { IDX: "3" } }
 hat-split-4: { extends: .hat-split, needs: [hat-train], variables: { IDX: "4" } }
-

@@ -3,9 +3,6 @@
 .qat-train:
   stage: qat-train
   extends: .common-train
-  needs:
-    - job: setup-stage
-      artifacts: true
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ln -s $EOS_SAMPLES/* $FILE
