@@ -20,7 +20,7 @@ hat-train:
     - conda remove -y pytorch-cuda
     - conda install conda-forge::cudatoolkit
     - mkdir out
-    - python $PROJECT/project/train_physics.py -fin $PROJECT/project/config_physics -meta $META_PATH -fout '' -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bg 'Py8EG_A14NNPDF23LO_jj_JZ0'
+    - python $PROJECT/project/train_physics.py -fin $PROJECT/project/config_physics -meta $META_PATH -fout '' -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bg 'Py8EG_A14NNPDF23LO_jj_JZ0' -type 'hat'
   artifacts:
     paths: [out/]
     expire_in: 2 days
@@ -32,12 +32,13 @@ hat-train:
     - set -euo pipefail
     - idx=$IDX
     - test -f "out/config_$idx.json" || { echo "missing out/config_$idx.json"; exit 1; }
-    - mkdir -p sel && mv "out/config_$idx.json" "sel/config_$idx.json"
+    - mkdir -p "sel/hat_$idx" && mv "out/config_$idx.json" "sel/hat_$idx/config_$idx.json"
     - rm -rf out && mv sel out
     - ls -R out
   artifacts:
     paths:
       - out/
+      - $PROJECT/project
     expire_in: 2 days
 
 hat-split-0: { extends: .hat-split, needs: [hat-train], variables: { IDX: "0" } }
