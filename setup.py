@@ -204,7 +204,7 @@ def alias_commands(export_vars):
         AGPU  = " --nv"
         EBIND = " --bind /usr/local/cuda:/usr/local/cuda,/usr/lib:/usr/lib"
         DBIND = " -v /usr/local/cuda:/usr/local/cuda -v /usr/lib:/usr/lib"
-        ALD   = " --env LD_LIBRARY_PATH=/urs/local/cuda/targets/x86_64-linux/lib:/workspace/Conda/envs/myenv/lib"
+        ALD   = " --env LD_LIBRARY_PATH=/usr/local/cuda/targets/x86_64-linux/lib:/workspace/Conda/envs/myenv/lib"
 
     #Docker alias
     #drun   = 'alias drun="'  +dockerBase+' --rm'     + GPU + ' -v '+PROJECT+':/workspace/workDir'+ DPASSWORD + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
