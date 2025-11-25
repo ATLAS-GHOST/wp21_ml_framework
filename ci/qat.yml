@@ -10,7 +10,13 @@
     - ls out/
     - source ~/.bashrc
     - myenv
+    #Temporary
+    - pip uninstall -y wp21_train
+    - pip install wp21_train
+    - conda remove -y pytorch-cuda
+    - conda install conda-forge::cudatoolkit    
     - for sub in 0 1 2 3 4; do mkdir -p "qat/hat_$IDX/qat_${sub}"; done
+    - python $PROJECT/project/train_physics.py -fin 'out/hat_$IDX/config_$IDX' -meta $META_PATH -fout '' -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bg 'Py8EG_A14NNPDF23LO_jj_JZ0' -type 'qat'
   artifacts:
     paths: [qat/]
     expire_in: 2 days
