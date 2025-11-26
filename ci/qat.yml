@@ -18,9 +18,9 @@
     - pip install wp21_train
     - conda remove -y pytorch-cuda
     - conda install conda-forge::cudatoolkit    
-    - for sub in 0 1 2 3 4; do mkdir -p "qat/hat_$IDX/qat_${sub}"; done
+    #- for sub in 0 1 2 3 4; do mkdir -p "qat/hat_$IDX/qat_${sub}"; done
     - export IN_PATH="out/hat_$IDX/config_$IDX"
-    - export OUT_PATH="qat/hat_$IDX/"
+    - export OUT_PATH="qat_$IDX/"
     - export META_NEW="$META_PATH/qat_$IDX/"
     - python $PROJECT/project/train_physics.py -fin $IN_PATH -meta $META_NEW -fout $OUT_PATH -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bg 'Py8EG_A14NNPDF23LO_jj_JZ0' -type 'qat'
   artifacts:
@@ -40,8 +40,8 @@ qat-4: { extends: .qat-train, needs: [{job: hat-split-4, artifacts: true}], vari
   extends: .common-small
   script:
     - set -euo pipefail
-    - test -d "qat/hat_$SLOT/qat_$SUB" || { echo "missing qat/hat_$SLOT/qat_$SUB"; exit 1; }
-    - mkdir -p sel/hat_"$SLOT" && mv "qat/hat_$SLOT/qat_$SUB" "sel/hat_$SLOT/qat_$SUB"
+    - test -d "qat_$SLOT" || { echo "missing qat_$SLOT"; exit 1; }
+    - mkdir -p sel/qat_"$SLOT" && mv "qat_$SLOT/config_$SUB.json" "sel/qat_$SLOT/config_$SUB.json"
     - rm -rf qat && mv sel qat
   artifacts:
     paths:
