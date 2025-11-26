@@ -4,9 +4,25 @@
   stage: hls-convert
   extends: .common-hls
   script:
-    - set -euo pipefail
-    - test -d "qat/hat_$SLOT/qat_$SUB" || { echo "Missing qat/hat_$SLOT/qat_$SUB"; exit 1; }
-    - mkdir -p "hls/qat_$SLOT/hls_$SUB"
+    - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
+    - ln -s $EOS_SAMPLES/* $FILE
+    - ls $PROJECT/project
+    - mkdir -p "$FILE" "$WORK_DIR"
+    - ln -s $PROJECT/* $WORK_DIR
+    - ln -s out/hat_$IDX $WORK_DIR
+    - ls out/
+    - source ~/.bashrc
+    - myenv
+    #Temporary
+    - pip uninstall -y wp21_train
+    - pip install wp21_train
+    - conda remove -y pytorch-cuda
+    - conda install conda-forge::cudatoolkit
+    - for sub in 0 1 2 3 4; do mkdir -p "hls/qat_$IDX/model_${sub}"; done    
+    - export IN_PATH="qat/hat_$IDX/config_$IDX"
+    - export OUT_PATH="hls/qat_$IDX/"
+    - export META_NEW="$META_PATH/hls_$IDX"
+    - python $PROJECT/project/train_physics.py -hls_enable -fin $IN_PATH -meta $META_NEW -fout $OUT_PATH -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bg 'Py8EG_A14NNPDF23LO_jj_JZ0' -type 'qat'
   artifacts: { paths: ["hls/qat_$SLOT/hls_$SUB"], expire_in: 2 days }
 
 # Pipeline-0

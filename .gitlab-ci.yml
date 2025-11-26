@@ -20,6 +20,6 @@ include:
   - local: 'ci/setup.yml'
   - local: 'ci/hat.yml'
   - local: 'ci/qat.yml'
-  #- local: 'ci/hls.yml'
+  - local: 'ci/hls.yml'
   #- local: 'ci/fw.yml'    
 
