@@ -43,7 +43,11 @@ qat-4: { extends: .qat-train, needs: [{job: hat-split-4, artifacts: true}], vari
     - test -d "qat/hat_$SLOT/qat_$SUB" || { echo "missing qat/hat_$SLOT/qat_$SUB"; exit 1; }
     - mkdir -p sel/hat_"$SLOT" && mv "qat/hat_$SLOT/qat_$SUB" "sel/hat_$SLOT/qat_$SUB"
     - rm -rf qat && mv sel qat
-  artifacts: { paths: ["qat/"], expire_in: 2 days }
+  artifacts:
+    paths:
+      - qat/
+      - $PROJECT/project
+    expire_in: 2 days
 
 # Pipeline-0
 qat-split-0-0: { extends: .qat-split, needs: [{job: qat-0, artifacts: true}], variables: { SLOT: "0", SUB: "0" } }
