@@ -18,12 +18,15 @@
     - pip install wp21_train
     - conda remove -y pytorch-cuda
     - conda install conda-forge::cudatoolkit
-    - for sub in 0 1 2 3 4; do mkdir -p "hls/qat_$IDX/model_${sub}"; done    
-    - export IN_PATH="qat/hat_$IDX/config_$IDX"
-    - export OUT_PATH="hls/qat_$IDX/"
-    - export META_NEW="$META_PATH/hls_$IDX"
+    - mkdir -p "hls/qat_$SLOT"
+    - export IN_PATH="qat/hat_$SLOT/config_$SUB"
+    - export OUT_PATH="hls/qat_$SUB/model_$SUB"
+    - export META_NEW="$META_PATH/hls_$SLOT/qat_$SUB"
     - python $PROJECT/project/train_physics.py -hls_enable -fin $IN_PATH -meta $META_NEW -fout $OUT_PATH -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bg 'Py8EG_A14NNPDF23LO_jj_JZ0' -type 'qat'
-  artifacts: { paths: ["hls/qat_$SLOT/hls_$SUB"], expire_in: 2 days }
+  artifacts:
+    paths:
+      - hls/qat_$SLOT/model_$SUB
+    expire_in: 2 days        
 
 # Pipeline-0
 hls-0-0: { extends: .hls-convert, needs: [{job: qat-split-0-0, artifacts: true}], variables: { SLOT: "0", SUB: "0" } }
