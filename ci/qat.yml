@@ -19,8 +19,10 @@
     - conda remove -y pytorch-cuda
     - conda install conda-forge::cudatoolkit    
     - for sub in 0 1 2 3 4; do mkdir -p "qat/hat_$IDX/qat_${sub}"; done
-    - export OUT_PATH="out/hat_$IDX/config_$IDX"
-    - python $PROJECT/project/train_physics.py -fin $OUT_PATH -meta $META_PATH -fout '' -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bg 'Py8EG_A14NNPDF23LO_jj_JZ0' -type 'qat'
+    - export IN_PATH="out/hat_$IDX/config_$IDX"
+    - export OUT_PATH="qat/hat_$IDX/"
+    - export META_NEW="$META_PATH/hat_$IDX/"
+    - python $PROJECT/project/train_physics.py -fin $IN_PATH -meta $META_NEW -fout $OUT_PATH -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bg 'Py8EG_A14NNPDF23LO_jj_JZ0' -type 'qat'
   artifacts:
     paths: [qat/]
     expire_in: 2 days
