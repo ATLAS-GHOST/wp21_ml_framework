@@ -9,8 +9,8 @@
     - ls $PROJECT/project
     - mkdir -p "$FILE" "$WORK_DIR"
     - ln -s $PROJECT/* $WORK_DIR
-    - ln -s out/hat_$IDX $WORK_DIR
-    - ls out/
+    - ln -s qat/hat_$IDX $WORK_DIR
+    - ls qat/
     - source ~/.bashrc
     - myenv
     #Temporary
