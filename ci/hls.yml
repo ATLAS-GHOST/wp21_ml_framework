@@ -22,6 +22,7 @@
     - export IN_PATH="qat/qat_$SLOT/config_$SUB"
     - export OUT_PATH="hls_$SLOT/model_$SUB"
     - export META_NEW="$META_PATH/hls_$SLOT/qat_$SUB"
+    - cat "qat/qat_$SLOT/config_$SUB.json"
     - python $PROJECT/project/train_physics.py -hls_enable -fin $IN_PATH -meta $META_NEW -fout $OUT_PATH -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bg 'Py8EG_A14NNPDF23LO_jj_JZ0' -type 'qat'
     - cp "qat/qat_$SLOT/config_$SUB.json" "hls_$SLOT/model_$SUB/config_$SUB.json"
   artifacts:
