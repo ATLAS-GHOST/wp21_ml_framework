@@ -23,6 +23,7 @@
     - export OUT_PATH="qat/qat_$IDX/"
     - export META_NEW="$META_PATH/qat_$IDX/"
     - python $PROJECT/project/train_physics.py -fin $IN_PATH -meta $META_NEW -fout $OUT_PATH -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bg 'Py8EG_A14NNPDF23LO_jj_JZ0' -type 'qat'
+    - ls qat/qat_$IDX/
   artifacts:
     paths:
       - qat/
