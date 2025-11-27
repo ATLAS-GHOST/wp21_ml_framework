@@ -2,7 +2,7 @@
 
 .fw-build:
   stage: fw-build
-  extends: .common-test
+  extends: .common-small
   script:
     - set -euo pipefail
     - test -d "hls_$SLOT/model_$SUB" || { echo "missing hls_$SLOT/model_$SUB"; exit 1; }
