@@ -11,6 +11,6 @@
 .common-fw:
   image: registry.cern.ch/ci4fpga/vivado:2024.1
   tags: [fpga-large]
-  
+
 .common-small:
   image: alpine:3.20

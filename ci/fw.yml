@@ -2,10 +2,11 @@
 
 .fw-build:
   stage: fw-build
-  extends: .common-fw
+  extends: .common-test
   script:
     - set -euo pipefail
-    - test -d "hls/qat_$SLOT/hls_$SUB" || { echo "missing hls/qat_$SLOT/hls_$SUB"; exit 1; }
+    - test -d "hls_$SLOT/model_$SUB" || { echo "missing hls_$SLOT/model_$SUB"; exit 1; }
+    - ls hls_$SLOT/
     - mkdir -p "fw/hls_$SLOT/fw_$SUB"
   artifacts: { paths: ["fw/hls_$SLOT/fw_$SUB"], expire_in: 7 days }
 
