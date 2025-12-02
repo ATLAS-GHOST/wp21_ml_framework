@@ -2,11 +2,14 @@
 
 .fw-build:
   stage: fw-build
-  extends: .common-small
+  extends: .common-fw
   script:
     - set -euo pipefail
     - test -d "hls_$SLOT/model_$SUB" || { echo "missing hls_$SLOT/model_$SUB"; exit 1; }
     - ls hls_$SLOT/
+    - pip install hls4ml
+    - cd $PROJECT/project/
+    - python synthesis.py -fin "hls_$SLOT/model_$SUB"
     - mkdir -p "fw/hls_$SLOT/fw_$SUB"
   artifacts: { paths: ["fw/hls_$SLOT/fw_$SUB"], expire_in: 7 days }
 
