@@ -10,7 +10,8 @@
     #- cd $PROJECT/project/
     #- python synthesis.py -fin "hls_$SLOT/model_$SUB/"
     #- cat "hls_$SLOT/model_$SUB/build_prj.tcl"
-    - vitis_hls "hls_$SLOT/model_$SUB/build_prj.tcl"
+    - cd "hls_$SLOT/model_$SUB/"
+    - vitis_hls build_prj.tcl
     - mkdir -p "fw/hls_$SLOT/fw_$SUB"
   artifacts: { paths: ["fw/hls_$SLOT/fw_$SUB"], expire_in: 7 days }
 
