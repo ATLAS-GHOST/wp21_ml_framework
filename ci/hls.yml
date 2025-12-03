@@ -27,7 +27,7 @@
     - ls "hls_$SLOT/model_$SUB/"
   artifacts:
     paths:
-      - hls_$SLOT/model_$SUB
+      - hls_$SLOT/model_$SUB/
       - $PROJECT/project
     expire_in: 2 days        
 
