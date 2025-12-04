@@ -1,4 +1,4 @@
-stages: [setup-ci, hat-train, hat-split, qat-train, qat-split, hls-convert, fw-build, collect-data]
+stages: [setup-ci, hat-train, hat-split, qat-train, qat-split, hls-convert, fw-build, collect-build]
 
 #Variables to link
 variables:
