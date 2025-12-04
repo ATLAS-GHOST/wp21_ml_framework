@@ -14,10 +14,10 @@
     - mkdir -p "fw/hls_$SLOT/fw_$SUB"
     - cp "$PROJECT/hls_$SLOT/model_$SUB/" "fw/hls_$SLOT/fw_$SUB/"
   artifacts:
-    - paths:
-        - fw/hls_$SLOT/fw_$SUB
-        - $PROJECT/project
-    - expire_in: 7 days
+    paths:
+      - fw/hls_$SLOT/fw_$SUB
+      - $PROJECT/project
+    expire_in: 7 days
 
 # Pipeline-0
 fw-build-0-0: { extends: .fw-build, needs: [{job: "hls-0-0", artifacts: true}], variables: { SLOT: "0", SUB: "0" } }
