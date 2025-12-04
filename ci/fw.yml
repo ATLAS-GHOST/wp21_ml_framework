@@ -17,7 +17,7 @@
     - paths:
         - fw/hls_$SLOT/fw_$SUB
         - $PROJECT/project
-    - expire_in: 7 days }
+    - expire_in: 7 days
 
 # Pipeline-0
 fw-build-0-0: { extends: .fw-build, needs: [{job: "hls-0-0", artifacts: true}], variables: { SLOT: "0", SUB: "0" } }
