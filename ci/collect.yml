@@ -1,7 +1,7 @@
 # Collect synthesis results
 
 .collect-data:
-  stage: collect
+  stage: collect-build
   extends: .common-hls
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
