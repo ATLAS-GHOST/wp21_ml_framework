@@ -7,12 +7,17 @@
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ln -s $EOS_SAMPLES/* $FILE
     - ls $PROJECT/project
+    - ln -s fw/hls_$SLOT/fw_$SUB $WORK_DIR
+    - ln -s $PROJECT/* $WORK_DIR
     - source ~/.bashrc
     - myenv
     #Temp. fix
     - pip uninstall -y wp21_train
     - pip install wp21_train
-    - export OUT_PATH="$META_PATH/results/hls_$SLOT/fw_$SUB"
+    - export OUT_PATH="$META_PATH/results/hls_$SLOT/fw_$SUB/config_$SUB"
+    - export IN_PATH="fw/hls_$SLOT/fw_$SUB"
+    - export CIN_PATH="fw/hls_$SLOT/fw_$SUB/config_$SUB"
+    - python collect.py -fin $IN_PATH -conf $CIN_PATH -fout $OUT_PATH
 
 # Pipeline-0
 collect-build-0-0: { extends: .collect-data, needs: [{job: "fw-build-0-0", artifacts: true}], variables: { SLOT: "0", SUB: "0"} }
