@@ -6,6 +6,7 @@
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ln -s $EOS_SAMPLES/* $FILE
+    - mkdir -p "$FILE" "$WORK_DIR"
     - ls $PROJECT/project
     - ln -s fw/hls_$SLOT/fw_$SUB $WORK_DIR
     - ln -s $PROJECT/* $WORK_DIR
