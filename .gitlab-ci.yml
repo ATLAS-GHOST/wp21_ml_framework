@@ -1,4 +1,4 @@
-stages: [setup-ci, hat-train, hat-split, qat-train, qat-split, hls-convert, fw-build]
+stages: [setup-ci, hat-train, hat-split, qat-train, qat-split, hls-convert, fw-build, collect-data]
 
 #Variables to link
 variables:
@@ -21,5 +21,6 @@ include:
   - local: 'ci/hat.yml'
   - local: 'ci/qat.yml'
   - local: 'ci/hls.yml'
-  - local: 'ci/fw.yml'    
+  - local: 'ci/fw.yml'
+  - local: 'ci/collect.yml'
 
