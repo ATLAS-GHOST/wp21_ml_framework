@@ -14,8 +14,9 @@
     - myenv
     #Temp. fix
     - pip uninstall -y wp21_train
-    - pip install wp21_train
-    - export OUT_PATH="$META_PATH/results/hls_$SLOT/fw_$SUB/config_$SUB"
+    - pip install wp21_train    
+    - export OUT_PATH="${META_PATH%/}/results/hls_$SLOT/fw_$SUB/config_$SUB"
+    - mkdir -p "${META_PATH%/}/results/hls_$SLOT/fw_$SUB"
     - export IN_PATH="fw/hls_$SLOT/fw_$SUB"
     - export CIN_PATH="fw/hls_$SLOT/fw_$SUB/config_$SUB"
     - python $PROJECT/project/collect.py -fin $IN_PATH -conf $CIN_PATH -fout $OUT_PATH
