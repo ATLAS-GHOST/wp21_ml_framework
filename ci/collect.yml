@@ -18,7 +18,7 @@
     - export OUT_PATH="$META_PATH/results/hls_$SLOT/fw_$SUB/config_$SUB"
     - export IN_PATH="fw/hls_$SLOT/fw_$SUB"
     - export CIN_PATH="fw/hls_$SLOT/fw_$SUB/config_$SUB"
-    - python collect.py -fin $IN_PATH -conf $CIN_PATH -fout $OUT_PATH
+    - python $PROJECT/project/collect.py -fin $IN_PATH -conf $CIN_PATH -fout $OUT_PATH
 
 # Pipeline-0
 collect-build-0-0: { extends: .collect-data, needs: [{job: "fw-build-0-0", artifacts: true}], variables: { SLOT: "0", SUB: "0"} }
