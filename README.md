@@ -1,6 +1,6 @@
 # WP21_ML_framework
 
-The current repository is the main repo for developments within the WP2.1 NGT project. The repository aims to provide a common platform for the different tools that are developed so that users don't have to worry about fetching different repositories to get the pipeline to work.
+The current repository is the main repo for developments within the WP2.1 NGT project. The repository aims to provide a common platform for the different tools that are developed so that users don't have to worry about fetching different repositories to get the pipeline to work. In addition the repository is now including the infrastructure to automatically optimize trigger algorithms provided by the user. An example of how to use this infrastructure is provided in the dev. branch and also outlines below.
 
 ## What is currently provided
 
@@ -8,7 +8,8 @@ The current repository is the main repo for developments within the WP2.1 NGT pr
 .
 ├── apptainer
 ├── docker
-└── wp21_train
+├── wp21_train
+└── project
 
 ```
 
@@ -24,7 +25,11 @@ The apptainer-wrapper container provides an interface where users can launch the
 
 This is the python package developed by the WP2.1 team to handle meta-data from the model development. The package can be build and installed via pip-install. The tools is provided via the PyPi interace and already added in the environment.yml within the containers. However if a custom version is needed it can be mounted via the TEST_FOLDER within the container.
 
-## How to use
+4. Project
+
+This is a dummy sub-modules provided by the developers of the NGT WP2.1 pipeline. The use can simply include as a sub-modules their own git repository. The only important thing is to ensure that the sub-modules is added under the folder project
+
+## How to use (standalone)
 
 In order to develop within the WP2.1 framework please use the following instructions:
 
@@ -123,6 +128,27 @@ abuild --tmp-dir <path-to-tmp-dir> --sif-dir <path-for-sif-file> --cache-dir <pa
 ```
 
 After completing those the .sif file will be generated in the folder indicated by the --sif-file (or $(pwd)). If the .sif file exists in the project folder this sif file is used. If a version of the sif file is present in eos then this version is picked automatically (priority to local).
+
+## How to use the CI infrastructure
+
+The CI infrastructure is aiming to remain independent from the underlying algorithm for this reason the user is discouraged to perform any modifications of how the CI stages are implemented. In order to utilize the existing work please see the below instructions:
+
+1. Request an algorithm specific branch from the repository maintainers
+
+```
+git clone <ml-framework-url>.git
+git checkout -b "my_branch"
+git submodule update --init --recursive
+git submodule add <custom_project_link>.git project/ #Over-writtes the dummy project
+
+```
+
+2. Triggering the CI by pushing to the specific branch
+
+**Note*** The CI is utilizing WP1.1 infrastructure and hence subject to delays when the resources are used. In addition the CI assumes project wide access into the EOS project folder where meta-data can be stored. However the meta-data in EOS aren't backed up and the WP2.1 team will be deleting them every month for a fair share of resources
+
+3. Pipeline currently in dev branch but soon with a few more modifications and optimizations it will migrate to v2.0 of the repository
+
 
 ## Developers
 
