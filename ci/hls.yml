@@ -1,0 +1,68 @@
+# YML file for HLS stage
+
+.hls-convert:
+  stage: hls-convert
+  extends: .common-hls
+  script:
+    - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
+    - ln -s $EOS_SAMPLES/* $FILE
+    - ls $PROJECT/project
+    - mkdir -p "$FILE" "$WORK_DIR"
+    - ln -s $PROJECT/* $WORK_DIR
+    - ln -s qat/hat_$IDX $WORK_DIR
+    - ls qat/
+    - source ~/.bashrc
+    - myenv
+    #Temporary
+    - pip uninstall -y wp21_train
+    - pip install wp21_train
+    - conda remove -y pytorch-cuda
+    - conda install conda-forge::cudatoolkit
+    - mkdir -p "hls/qat_$SLOT"
+    - export IN_PATH="qat/qat_$SLOT/config_$SUB"
+    - export OUT_PATH="hls_$SLOT/model_$SUB"
+    - export META_NEW="$META_PATH/hls_$SLOT/qat_$SUB"
+    - python $PROJECT/project/train_physics.py -hls_enable -fin $IN_PATH -meta $META_NEW -fout $OUT_PATH -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bg 'Py8EG_A14NNPDF23LO_jj_JZ0' -type 'qat'
+    - cp "qat/qat_$SLOT/config_$SUB.json" "hls_$SLOT/model_$SUB/config_$SUB.json"
+    - ls "hls_$SLOT/model_$SUB/"
+  artifacts:
+    paths:
+      - hls_$SLOT/model_$SUB/
+      - $PROJECT/project
+    expire_in: 2 days        
+
+# Pipeline-0
+hls-0-0: { extends: .hls-convert, needs: [{job: qat-split-0-0, artifacts: true}], variables: { SLOT: "0", SUB: "0" } }
+hls-0-1: { extends: .hls-convert, needs: [{job: qat-split-0-1, artifacts: true}], variables: { SLOT: "0", SUB: "1" } }
+hls-0-2: { extends: .hls-convert, needs: [{job: qat-split-0-2, artifacts: true}], variables: { SLOT: "0", SUB: "2" } }
+hls-0-3: { extends: .hls-convert, needs: [{job: qat-split-0-3, artifacts: true}], variables: { SLOT: "0", SUB: "3" } }
+hls-0-4: { extends: .hls-convert, needs: [{job: qat-split-0-4, artifacts: true}], variables: { SLOT: "0", SUB: "4" } }
+
+# Pipeline-1
+hls-1-0: { extends: .hls-convert, needs: [{job: qat-split-1-0, artifacts: true}], variables: { SLOT: "1", SUB: "0" } }
+hls-1-1: { extends: .hls-convert, needs: [{job: qat-split-1-1, artifacts: true}], variables: { SLOT: "1", SUB: "1" } }
+hls-1-2: { extends: .hls-convert, needs: [{job: qat-split-1-2, artifacts: true}], variables: { SLOT: "1", SUB: "2" } }
+hls-1-3: { extends: .hls-convert, needs: [{job: qat-split-1-3, artifacts: true}], variables: { SLOT: "1", SUB: "3" } }
+hls-1-4: { extends: .hls-convert, needs: [{job: qat-split-1-4, artifacts: true}], variables: { SLOT: "1", SUB: "4" } }
+
+# Pipeline-2
+hls-2-0: { extends: .hls-convert, needs: [{job: qat-split-2-0, artifacts: true}], variables: { SLOT: "2", SUB: "0" } }
+hls-2-1: { extends: .hls-convert, needs: [{job: qat-split-2-1, artifacts: true}], variables: { SLOT: "2", SUB: "1" } }
+hls-2-2: { extends: .hls-convert, needs: [{job: qat-split-2-2, artifacts: true}], variables: { SLOT: "2", SUB: "2" } }
+hls-2-3: { extends: .hls-convert, needs: [{job: qat-split-2-3, artifacts: true}], variables: { SLOT: "2", SUB: "3" } }
+hls-2-4: { extends: .hls-convert, needs: [{job: qat-split-2-4, artifacts: true}], variables: { SLOT: "2", SUB: "4" } }
+
+# Pipeline-3
+hls-3-0: { extends: .hls-convert, needs: [{job: qat-split-3-0, artifacts: true}], variables: { SLOT: "3", SUB: "0" } }
+hls-3-1: { extends: .hls-convert, needs: [{job: qat-split-3-1, artifacts: true}], variables: { SLOT: "3", SUB: "1" } }
+hls-3-2: { extends: .hls-convert, needs: [{job: qat-split-3-2, artifacts: true}], variables: { SLOT: "3", SUB: "2" } }
+hls-3-3: { extends: .hls-convert, needs: [{job: qat-split-3-3, artifacts: true}], variables: { SLOT: "3", SUB: "3" } }
+hls-3-4: { extends: .hls-convert, needs: [{job: qat-split-3-4, artifacts: true}], variables: { SLOT: "3", SUB: "4" } }
+
+# Pipeline-4
+hls-4-0: { extends: .hls-convert, needs: [{job: qat-split-4-0, artifacts: true}], variables: { SLOT: "4", SUB: "0" } }
+hls-4-1: { extends: .hls-convert, needs: [{job: qat-split-4-1, artifacts: true}], variables: { SLOT: "4", SUB: "1" } }
+hls-4-2: { extends: .hls-convert, needs: [{job: qat-split-4-2, artifacts: true}], variables: { SLOT: "4", SUB: "2" } }
+hls-4-3: { extends: .hls-convert, needs: [{job: qat-split-4-3, artifacts: true}], variables: { SLOT: "4", SUB: "3" } }
+hls-4-4: { extends: .hls-convert, needs: [{job: qat-split-4-4, artifacts: true}], variables: { SLOT: "4", SUB: "4" } }
+

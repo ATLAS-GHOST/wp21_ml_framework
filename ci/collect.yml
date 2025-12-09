@@ -1,0 +1,58 @@
+# Collect synthesis results
+
+.collect-data:
+  stage: collect-data
+  extends: .common-hls
+  script:
+    - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
+    - ln -s $EOS_SAMPLES/* $FILE
+    - mkdir -p "$FILE" "$WORK_DIR"
+    - ls $PROJECT/project
+    - ln -s fw/hls_$SLOT/fw_$SUB $WORK_DIR
+    - ln -s $PROJECT/* $WORK_DIR
+    - source ~/.bashrc
+    - myenv
+    #Temp. fix
+    - pip uninstall -y wp21_train
+    - pip install wp21_train    
+    - export OUT_PATH="${META_PATH%/}/results/hls_$SLOT/fw_$SUB/config_$SUB"
+    - mkdir -p "${META_PATH%/}/results/hls_$SLOT/fw_$SUB"
+    - export IN_PATH="fw/hls_$SLOT/fw_$SUB"
+    - export CIN_PATH="fw/hls_$SLOT/fw_$SUB/config_$SUB"
+    - python $PROJECT/project/collect.py -fin $IN_PATH -conf $CIN_PATH -fout $OUT_PATH
+
+# Pipeline-0
+collect-build-0-0: { extends: .collect-data, needs: [{job: "fw-build-0-0", artifacts: true}], variables: { SLOT: "0", SUB: "0"} }
+collect-build-0-1: { extends: .collect-data, needs: [{job: "fw-build-0-1", artifacts: true}], variables: { SLOT: "0", SUB: "1"} }
+collect-build-0-2: { extends: .collect-data, needs: [{job: "fw-build-0-2", artifacts: true}], variables: { SLOT: "0", SUB: "2"} }
+collect-build-0-3: { extends: .collect-data, needs: [{job: "fw-build-0-3", artifacts: true}], variables: { SLOT: "0", SUB: "3"} }
+collect-build-0-4: { extends: .collect-data, needs: [{job: "fw-build-0-4", artifacts: true}], variables: { SLOT: "0", SUB: "4"} }
+
+# Pipeline-1
+collect-build-1-0: { extends: .collect-data, needs: [{job: "fw-build-1-0", artifacts: true}], variables: { SLOT: "1", SUB: "0"} }
+collect-build-1-1: { extends: .collect-data, needs: [{job: "fw-build-1-1", artifacts: true}], variables: { SLOT: "1", SUB: "1"} }
+collect-build-1-2: { extends: .collect-data, needs: [{job: "fw-build-1-2", artifacts: true}], variables: { SLOT: "1", SUB: "2"} }
+collect-build-1-3: { extends: .collect-data, needs: [{job: "fw-build-1-3", artifacts: true}], variables: { SLOT: "1", SUB: "3"} }
+collect-build-1-4: { extends: .collect-data, needs: [{job: "fw-build-1-4", artifacts: true}], variables: { SLOT: "1", SUB: "4"} }
+
+# Pipeline-2
+collect-build-2-0: { extends: .collect-data, needs: [{job: "fw-build-2-0", artifacts: true}], variables: { SLOT: "2", SUB: "0"} }
+collect-build-2-1: { extends: .collect-data, needs: [{job: "fw-build-2-1", artifacts: true}], variables: { SLOT: "2", SUB: "1"} }
+collect-build-2-2: { extends: .collect-data, needs: [{job: "fw-build-2-2", artifacts: true}], variables: { SLOT: "2", SUB: "2"} }
+collect-build-2-3: { extends: .collect-data, needs: [{job: "fw-build-2-3", artifacts: true}], variables: { SLOT: "2", SUB: "3"} }
+collect-build-2-4: { extends: .collect-data, needs: [{job: "fw-build-2-4", artifacts: true}], variables: { SLOT: "2", SUB: "4"} }
+
+# Pipeline-3
+collect-build-3-0: { extends: .collect-data, needs: [{job: "fw-build-3-0", artifacts: true}], variables: { SLOT: "3", SUB: "0"} }
+collect-build-3-1: { extends: .collect-data, needs: [{job: "fw-build-3-1", artifacts: true}], variables: { SLOT: "3", SUB: "1"} }
+collect-build-3-2: { extends: .collect-data, needs: [{job: "fw-build-3-2", artifacts: true}], variables: { SLOT: "3", SUB: "2"} }
+collect-build-3-3: { extends: .collect-data, needs: [{job: "fw-build-3-3", artifacts: true}], variables: { SLOT: "3", SUB: "3"} }
+collect-build-3-4: { extends: .collect-data, needs: [{job: "fw-build-3-4", artifacts: true}], variables: { SLOT: "3", SUB: "4"} }
+
+# Pipeline-4
+collect-build-4-0: { extends: .collect-data, needs: [{job: "fw-build-4-0", artifacts: true}], variables: { SLOT: "4", SUB: "0"} }
+collect-build-4-1: { extends: .collect-data, needs: [{job: "fw-build-4-1", artifacts: true}], variables: { SLOT: "4", SUB: "1"} }
+collect-build-4-2: { extends: .collect-data, needs: [{job: "fw-build-4-2", artifacts: true}], variables: { SLOT: "4", SUB: "2"} }
+collect-build-4-3: { extends: .collect-data, needs: [{job: "fw-build-4-3", artifacts: true}], variables: { SLOT: "4", SUB: "3"} }
+collect-build-4-4: { extends: .collect-data, needs: [{job: "fw-build-4-4", artifacts: true}], variables: { SLOT: "4", SUB: "4"} }
+

@@ -1,0 +1,16 @@
+#YML file with default parameters
+
+.common-train:
+  image: registry.cern.ch/atlas-ngt-wp21/train
+  tags: [cern-nextgen-h100]
+
+.common-hls:
+  image: registry.cern.ch/atlas-ngt-wp21/hls4ml_only
+  tags: [cern-nextgen-mi300x]
+
+.common-fw:
+  image: registry.cern.ch/ci4fpga/vivado:2024.1
+  tags: [fpga-large]
+
+.common-small:
+  image: alpine:3.20

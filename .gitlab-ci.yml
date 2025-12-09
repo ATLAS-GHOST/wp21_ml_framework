@@ -1,0 +1,26 @@
+stages: [setup-ci, hat-train, hat-split, qat-train, qat-split, hls-convert, fw-build, collect-data]
+
+#Variables to link
+variables:
+  EOS_SAMPLES: "/eos/project-a/atlas-ngt-wp21/samples/GlobalSamples"
+  FILE: "/workspace/samples"
+  WORK_DIR: "/workspace/workDir"
+  PROJECT: "$CI_PROJECT_DIR" #Change to project folder (as sub-module)
+  META_PATH: "/eos/project/a/atlas-ngt-wp21/meta-data/$GITLAB_USER_LOGIN/$CI_COMMIT_SHA/"
+  GIT_SUBMODULE_STRATEGY: none
+
+#Helper definition
+default:
+  before_script:
+    - myenv() { conda activate myenv; }
+    
+#Stage file inclusion
+include:
+  - local: 'ci/_shared.yml'
+  - local: 'ci/setup.yml'
+  - local: 'ci/hat.yml'
+  - local: 'ci/qat.yml'
+  - local: 'ci/hls.yml'
+  - local: 'ci/fw.yml'
+  - local: 'ci/collect.yml'
+

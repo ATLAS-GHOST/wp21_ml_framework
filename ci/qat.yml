@@ -1,0 +1,85 @@
+#YML file for QAT stage
+
+.qat-train:
+  stage: qat-train
+  extends: .common-train
+  script:
+    - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
+    - ln -s $EOS_SAMPLES/* $FILE
+    - ls $PROJECT/project
+    - mkdir -p "$FILE" "$WORK_DIR"
+    - ln -s $PROJECT/* $WORK_DIR
+    - ln -s out/hat_$IDX $WORK_DIR
+    - ls out/
+    - source ~/.bashrc
+    - myenv
+    #Temporary
+    - pip uninstall -y wp21_train
+    - pip install wp21_train
+    - conda remove -y pytorch-cuda
+    - conda install conda-forge::cudatoolkit    
+    #- for sub in 0 1 2 3 4; do mkdir -p "qat/hat_$IDX/qat_${sub}"; done
+    - export IN_PATH="out/hat_$IDX/config_$IDX"
+    - export OUT_PATH="qat/qat_$IDX/"
+    - export META_NEW="$META_PATH/qat_$IDX/"
+    - python $PROJECT/project/train_physics.py -fin $IN_PATH -meta $META_NEW -fout $OUT_PATH -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bg 'Py8EG_A14NNPDF23LO_jj_JZ0' -type 'qat'
+  artifacts:
+    paths:
+      - qat/
+      - $PROJECT/project
+    expire_in: 2 days
+
+qat-0: { extends: .qat-train, needs: [{job: hat-split-0, artifacts: true}], variables: { IDX: "0" } }
+qat-1: { extends: .qat-train, needs: [{job: hat-split-1, artifacts: true}], variables: { IDX: "1" } }
+qat-2: { extends: .qat-train, needs: [{job: hat-split-2, artifacts: true}], variables: { IDX: "2" } }
+qat-3: { extends: .qat-train, needs: [{job: hat-split-3, artifacts: true}], variables: { IDX: "3" } }
+qat-4: { extends: .qat-train, needs: [{job: hat-split-4, artifacts: true}], variables: { IDX: "4" } }
+
+.qat-split:
+  stage: qat-split
+  extends: .common-small
+  script:
+    - set -euo pipefail
+    - test -d "qat/qat_$SLOT/out" || { echo "missing qat/qat_$SLOT/out"; exit 1; }
+    - mkdir -p sel/qat_"$SLOT" && mv "qat/qat_$SLOT/out/config_$SUB.json" "sel/qat_$SLOT/config_$SUB.json"
+    - rm -rf qat && mv sel qat
+  artifacts:
+    paths:
+      - qat/
+      - $PROJECT/project
+    expire_in: 2 days
+
+# Pipeline-0
+qat-split-0-0: { extends: .qat-split, needs: [{job: qat-0, artifacts: true}], variables: { SLOT: "0", SUB: "0" } }
+qat-split-0-1: { extends: .qat-split, needs: [{job: qat-0, artifacts: true}], variables: { SLOT: "0", SUB: "1" } }
+qat-split-0-2: { extends: .qat-split, needs: [{job: qat-0, artifacts: true}], variables: { SLOT: "0", SUB: "2" } }
+qat-split-0-3: { extends: .qat-split, needs: [{job: qat-0, artifacts: true}], variables: { SLOT: "0", SUB: "3" } }
+qat-split-0-4: { extends: .qat-split, needs: [{job: qat-0, artifacts: true}], variables: { SLOT: "0", SUB: "4" } }
+
+# Pipeline-1
+qat-split-1-0: { extends: .qat-split, needs: [{job: qat-1, artifacts: true}], variables: { SLOT: "1", SUB: "0" } }
+qat-split-1-1: { extends: .qat-split, needs: [{job: qat-1, artifacts: true}], variables: { SLOT: "1", SUB: "1" } }
+qat-split-1-2: { extends: .qat-split, needs: [{job: qat-1, artifacts: true}], variables: { SLOT: "1", SUB: "2" } }
+qat-split-1-3: { extends: .qat-split, needs: [{job: qat-1, artifacts: true}], variables: { SLOT: "1", SUB: "3" } }
+qat-split-1-4: { extends: .qat-split, needs: [{job: qat-1, artifacts: true}], variables: { SLOT: "1", SUB: "4" } }
+
+# Pipeline-2
+qat-split-2-0: { extends: .qat-split, needs: [{job: qat-2, artifacts: true}], variables: { SLOT: "2", SUB: "0" } }
+qat-split-2-1: { extends: .qat-split, needs: [{job: qat-2, artifacts: true}], variables: { SLOT: "2", SUB: "1" } }
+qat-split-2-2: { extends: .qat-split, needs: [{job: qat-2, artifacts: true}], variables: { SLOT: "2", SUB: "2" } }
+qat-split-2-3: { extends: .qat-split, needs: [{job: qat-2, artifacts: true}], variables: { SLOT: "2", SUB: "3" } }
+qat-split-2-4: { extends: .qat-split, needs: [{job: qat-2, artifacts: true}], variables: { SLOT: "2", SUB: "4" } }
+
+# Pipeline-3
+qat-split-3-0: { extends: .qat-split, needs: [{job: qat-3, artifacts: true}], variables: { SLOT: "3", SUB: "0" } }
+qat-split-3-1: { extends: .qat-split, needs: [{job: qat-3, artifacts: true}], variables: { SLOT: "3", SUB: "1" } }
+qat-split-3-2: { extends: .qat-split, needs: [{job: qat-3, artifacts: true}], variables: { SLOT: "3", SUB: "2" } }
+qat-split-3-3: { extends: .qat-split, needs: [{job: qat-3, artifacts: true}], variables: { SLOT: "3", SUB: "3" } }
+qat-split-3-4: { extends: .qat-split, needs: [{job: qat-3, artifacts: true}], variables: { SLOT: "3", SUB: "4" } }
+
+# Pipeline-4
+qat-split-4-0: { extends: .qat-split, needs: [{job: qat-4, artifacts: true}], variables: { SLOT: "4", SUB: "0" } }
+qat-split-4-1: { extends: .qat-split, needs: [{job: qat-4, artifacts: true}], variables: { SLOT: "4", SUB: "1" } }
+qat-split-4-2: { extends: .qat-split, needs: [{job: qat-4, artifacts: true}], variables: { SLOT: "4", SUB: "2" } }
+qat-split-4-3: { extends: .qat-split, needs: [{job: qat-4, artifacts: true}], variables: { SLOT: "4", SUB: "3" } }
+qat-split-4-4: { extends: .qat-split, needs: [{job: qat-4, artifacts: true}], variables: { SLOT: "4", SUB: "4" } }

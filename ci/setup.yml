@@ -1,0 +1,14 @@
+#YML file for setting up paths
+
+setup-stage:
+  stage: setup-ci
+  extends: .common-train
+  script:
+    - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
+    - mkdir -p $META_PATH
+    - git submodule set-url project "https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cern.ch/atlas-nextgen-wp21/dummy_ml_prj.git"
+    - git submodule sync -- project
+    - git submodule update --init --depth 1 project
+  artifacts:
+    paths: [project/]
+    expire_in: 2 days
