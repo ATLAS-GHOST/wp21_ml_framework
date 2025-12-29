@@ -15,6 +15,16 @@ print("#####################################")
 
 var = ["ENV_NAME","CONT_NAME","CONT_LOC","SAMPLE_PATH","SAMPLE_NAME","SAMPLE_EOS","PROJECT_FOLDER","PROJECT_NAME","TEST_FOLDER","TEST_PACKAGE","KRB_ACCOUNT","KRB_PASSWORD","KUBEFLOW_FILE","JUPYTER_PORT"]
 
+LD_PATHS = {
+    'train_v2': [
+        '/workspace/Conda/envs/base_env/lib:',
+        '/workspace/Conda/envs/tf_v2/lib:',
+        '/workspace/Conda/envs/tf_v3/lib:',
+        '/workspace/Conda/envs/pytorch/lib:',
+        '/workspace/Conda/evns/xgboost/lib'
+        ],
+}
+
 var_desc = ["Name of the current working environment",
             "Name of the container [hls4ml, conifer, custom]",
             "Container location [harbor, cvmfs, custom]",
@@ -155,13 +165,13 @@ def alias_commands(export_vars):
     DPASSWORD = ''
     APASSWORD = ''
     if export_vars['exports']['KRB_PASSWORD'] != '':
-        #print(f"[INFO] Password file provided from: {export_vars['exports']['KRB_PASSWORD']}")
         log_message("info",f"Password file provided from {export_vars['exports']['KRB_PASSWORD']}")
         DPASSWORD = ' -v $KRB_PASSWORD:/secrets/password.pass:ro'
         APASSWORD = ' --bind $KRB_PASSWORD:/secrets/password.pass:ro'
 
     FILE  = ' -e SAMPLE_PATH=$SAMPLE_PATH -e SAMPLE_NAME=$SAMPLE_NAME'
     AFILE = ' --env SAMPLE_PATH=$SAMPLE_PATH --env SAMPLE_NAME=$SAMPLE_NAME'
+
     if "no" in export_vars['exports']['SAMPLE_EOS']:
         FILE  = ' -v $SAMPLE_PATH$SAMPLE_NAME:/workspace/samples/$SAMPLE_NAME:ro'
         if '/eos' in export_vars['exports']['SAMPLE_PATH']:
@@ -204,7 +214,12 @@ def alias_commands(export_vars):
         AGPU  = " --nv"
         EBIND = " --bind /usr/local/cuda:/usr/local/cuda,/usr/lib:/usr/lib"
         DBIND = " -v /usr/local/cuda:/usr/local/cuda -v /usr/lib:/usr/lib"
-        ALD   = " --env LD_LIBRARY_PATH=/usr/local/cuda/targets/x86_64-linux/lib:/workspace/Conda/envs/myenv/lib"
+        ALD   = " --env LD_LIBRARY_PATH=/usr/local/cuda/targets/x86_64-linux/lib:"
+        if export_vars['exports']['CONT_NAME'] in LD_PATHS:
+            for i_path in LD_PATHS[export_vars['exports']['CONT_NAME']]:
+                ALD += i_path
+        else:
+            ALD += "/workspace/Conda/envs/myenv/lib"
 
     #Docker alias
     #drun   = 'alias drun="'  +dockerBase+' --rm'     + GPU + ' -v '+PROJECT+':/workspace/workDir'+ DPASSWORD + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
@@ -225,7 +240,7 @@ def alias_commands(export_vars):
     \tCMD+="{GPU} {DBIND}"\n\
     fi\n\
     \n\
-    CMD+=" -v {PROJECT}:/workspace/workDir {DPASSWORD} {DTEST} {FILE} {ACCOUNT} -p $JUPYTER_PORT:$JUPYTER_PORT {CONT}"\n\
+    CMD+=" -v {PROJECT}:/workspace/workDir {DPASSWORD} {DTEST} {FILE} {ACCOUNT} -e DISPLAY=$DISPLAY -p $JUPYTER_PORT:$JUPYTER_PORT {CONT}"\n\
     CMD+=" ${{ARGS[*]}}"\n\
     \n\
     eval "$CMD"\n\
@@ -328,7 +343,7 @@ def alias_commands(export_vars):
     \tCMD+="{AGPU} {EBIND}"\n\
     fi\n\
     \n\
-    CMD+=" --bind {PROJECT}:/workspace/workDir {APASSWORD} {ATEST} {AFILE} --env JPORT=$JUPYTER_PORT {ALD} {ACONT}"\n\
+    CMD+=" --bind {PROJECT}:/workspace/workDir {APASSWORD} {ATEST} {AFILE} --env JPORT=$JUPYTER_PORT --env DISPLAY=$DISPLAY {ALD} {ACONT}"\n\
     CMD+=" ${{ARGS[*]}}"\n\
     \n\
     eval "$CMD"\n\
