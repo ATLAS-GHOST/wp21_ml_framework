@@ -19,7 +19,8 @@ hat-train:
     #- pip install wp21_train
     #- conda remove -y pytorch-cuda
     #- conda install conda-forge::cudatoolkit
-    - python -m pip install -U nvidia-cuda-nvrtc-cu11 nvidia-cuda-runtime-cu11
+    #- python -m pip install -U nvidia-cuda-nvrtc-cu11 nvidia-cuda-runtime-cu11
+    - export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib:${CONDA_PREFIX}/lib64:${LD_LIBRARY_PATH:-}"
     - mkdir out
     - python $PROJECT/project/train_physics.py -fin $PROJECT/project/config_physics -meta "$META_PATH/hat" -fout '' -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bg 'Py8EG_A14NNPDF23LO_jj_JZ0' -type 'hat'
   artifacts:
