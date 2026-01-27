@@ -12,7 +12,11 @@ variables:
 #Helper definition
 default:
   before_script:
-    - myenv() { conda activate myenv; }
+    - tf_v2() { conda activate tf_v2; }
+    - tf_v3() { conda activate tf_v3; }
+    - xgboost() { conda activate xgboost; }
+    - pytorch() { conda activate pytorch; }
+    - base() { conda activate base; }
     
 #Stage file inclusion
 include:
