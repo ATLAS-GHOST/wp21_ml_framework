@@ -20,7 +20,8 @@ hat-train:
     #- conda remove -y pytorch-cuda
     #- conda install conda-forge::cudatoolkit
     #- python -m pip install -U nvidia-cuda-nvrtc-cu11 nvidia-cuda-runtime-cu11
-    - echo $CONDA_PREFIX
+    - ls $CONDA_PREFIX/lib
+    - ls $CONDA_PREDIX/lib64
     - export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib:${CONDA_PREFIX}/lib64:${LD_LIBRARY_PATH:-}"
     - python -c "import ctypes; ctypes.CDLL('libnvrtc.so'); print('nvrtc ok')"    
     - mkdir out
