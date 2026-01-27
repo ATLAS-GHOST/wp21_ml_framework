@@ -20,7 +20,17 @@ hat-train:
     #- conda remove -y pytorch-cuda
     #- conda install conda-forge::cudatoolkit
     - python -m pip install -U nvidia-cuda-nvrtc-cu11 nvidia-cuda-runtime-cu11
-    - export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib:${CONDA_PREFIX}/lib64:/usr/local/cuda/targets/x86_64-linux/lib:${LD_LIBRARY_PATH:-}"
+    - NVRTC_DIR="$(python - <<'PY'
+    import site, glob, os
+    hits=[]
+    for sp in site.getsitepackages():
+      hits += glob.glob(os.path.join(sp, "nvidia", "**", "libnvrtc.so*"), recursive=True)
+    hits=sorted(set(hits))
+    print(os.path.dirname(hits[0]) if hits else "")
+    PY
+    )"
+    - export LD_LIBRARY_PATH="$NVRTC_DIR:${CONDA_PREFIX}/lib:${CONDA_PREFIX}/lib64:${LD_LIBRARY_PATH:-}"
+    - python -c "import ctypes; ctypes.CDLL('libnvrtc.so'); print('nvrtc ok')"
     - mkdir out
     - python $PROJECT/project/train_physics.py -fin $PROJECT/project/config_physics -meta "$META_PATH/hat" -fout '' -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bg 'Py8EG_A14NNPDF23LO_jj_JZ0' -type 'hat'
   artifacts:
