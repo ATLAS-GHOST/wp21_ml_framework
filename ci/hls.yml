@@ -17,7 +17,7 @@
     #- pip uninstall -y wp21_train
     #- pip install wp21_train
     #- conda remove -y pytorch-cuda
-    #- conda install conda-forge::cudatoolkit
+    - conda install conda-forge::cudatoolkit
     - mkdir -p "hls/qat_$SLOT"
     - export IN_PATH="qat/qat_$SLOT/config_$SUB"
     - export OUT_PATH="hls_$SLOT/model_$SUB"

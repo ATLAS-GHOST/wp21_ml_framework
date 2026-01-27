@@ -17,7 +17,7 @@
     #- pip uninstall -y wp21_train
     #- pip install wp21_train
     #- conda remove -y pytorch-cuda
-    #- conda install conda-forge::cudatoolkit    
+    - conda install conda-forge::cudatoolkit    
     #- for sub in 0 1 2 3 4; do mkdir -p "qat/hat_$IDX/qat_${sub}"; done
     - export IN_PATH="out/hat_$IDX/config_$IDX"
     - export OUT_PATH="qat/qat_$IDX/"
