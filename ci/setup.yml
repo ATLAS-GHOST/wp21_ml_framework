@@ -2,7 +2,7 @@
 
 setup-stage:
   stage: setup-ci
-  extends: .common-train
+  extends: .common-train-v2
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - mkdir -p $META_PATH

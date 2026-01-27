@@ -2,7 +2,7 @@
 
 .hls-convert:
   stage: hls-convert
-  extends: .common-hls
+  extends: .common-hls-v2
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ln -s $EOS_SAMPLES/* $FILE
@@ -12,12 +12,12 @@
     - ln -s qat/hat_$IDX $WORK_DIR
     - ls qat/
     - source ~/.bashrc
-    - myenv
+    - tf_v2
     #Temporary
-    - pip uninstall -y wp21_train
-    - pip install wp21_train
-    - conda remove -y pytorch-cuda
-    - conda install conda-forge::cudatoolkit
+    #- pip uninstall -y wp21_train
+    #- pip install wp21_train
+    #- conda remove -y pytorch-cuda
+    #- conda install conda-forge::cudatoolkit
     - mkdir -p "hls/qat_$SLOT"
     - export IN_PATH="qat/qat_$SLOT/config_$SUB"
     - export OUT_PATH="hls_$SLOT/model_$SUB"

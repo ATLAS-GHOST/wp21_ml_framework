@@ -14,3 +14,15 @@
 
 .common-small:
   image: alpine:3.20
+
+.common-train-v2:
+  image: registry.cern.ch/atlas-ngt-wp21/train_v2
+  tags: [cern-nextgen-h100]
+
+.common-hls-v2:
+  image: registry.cern.ch/atlas-ngt-wp21/train_v2
+  tags: [cern-nextgen-highmem]
+
+.common-fw-v2:
+  image: registry.cern.ch/ci4fpga/vivado:2024.1
+  tags: [cern-nextgen-highmem]

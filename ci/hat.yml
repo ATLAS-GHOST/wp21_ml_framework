@@ -2,7 +2,7 @@
 
 hat-train:
   stage: hat-train
-  extends: .common-train
+  extends: .common-train-v2
   needs:
     - job: setup-stage
       artifacts: true
@@ -13,12 +13,12 @@ hat-train:
     - mkdir -p "$FILE" "$WORK_DIR"
     - ln -s $PROJECT/* $WORK_DIR
     - source ~/.bashrc
-    - myenv
+    - tf_v2
     #Temporary
-    - pip uninstall -y wp21_train
-    - pip install wp21_train
-    - conda remove -y pytorch-cuda
-    - conda install conda-forge::cudatoolkit
+    #- pip uninstall -y wp21_train
+    #- pip install wp21_train
+    #- conda remove -y pytorch-cuda
+    #- conda install conda-forge::cudatoolkit
     - mkdir out
     - python $PROJECT/project/train_physics.py -fin $PROJECT/project/config_physics -meta "$META_PATH/hat" -fout '' -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bg 'Py8EG_A14NNPDF23LO_jj_JZ0' -type 'hat'
   artifacts:
