@@ -6,7 +6,7 @@
 
 .common-hls:
   image: registry.cern.ch/atlas-ngt-wp21/hls4ml_only
-  tags: [cern-nextgen-mi300x]
+  tags: [cern-nextgen-highmem]
 
 .common-fw:
   image: registry.cern.ch/ci4fpga/vivado:2024.1
