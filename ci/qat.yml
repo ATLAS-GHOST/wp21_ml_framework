@@ -12,12 +12,11 @@
     - ln -s out/hat_$IDX $WORK_DIR
     - ls out/
     - source ~/.bashrc
-    - tf_v2
-    #Temporary
-    #- pip uninstall -y wp21_train
-    #- pip install wp21_train
-    #- conda remove -y pytorch-cuda
-    - conda install conda-forge::cudatoolkit    
+    - source $PROJECT/project/set_env.sh $PROJECT/project/config_physics.json
+    - export NVIDIA_LIB="$CONDA_PREFIX/lib/python3.10/site-packages/nvidia/cuda_nvrtc/lib"
+    - ls -l "$NVIDIA_LIB"/libnvrtc.so* || true
+    - ln -s "$NVIDIA_LIB/libnvrtc.so.12" "$NVIDIA_LIB/libnvrtc.so"
+    - export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib/python3.10/site-packages/nvidia/cuda_nvrtc/lib:${LD_LIBRARY_PATH:-}"    
     #- for sub in 0 1 2 3 4; do mkdir -p "qat/hat_$IDX/qat_${sub}"; done
     - export IN_PATH="out/hat_$IDX/config_$IDX"
     - export OUT_PATH="qat/qat_$IDX/"
