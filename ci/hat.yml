@@ -13,13 +13,7 @@ hat-train:
     - mkdir -p "$FILE" "$WORK_DIR"
     - ln -s $PROJECT/* $WORK_DIR
     - source ~/.bashrc
-    - tf_v2
-    #Temporary
-    #- pip uninstall -y wp21_train
-    #- pip install wp21_train
-    #- conda remove -y pytorch-cuda
-    #- conda install conda-forge::cudatoolkit
-    #- conda install nvidia-cuda-nvrtc-cu11 nvidia-cuda-runtime-cu11
+    - source $PROJECT/project/set_env.sh $PROJECT/project/config_physics.json
     - export NVIDIA_LIB="$CONDA_PREFIX/lib/python3.10/site-packages/nvidia/cuda_nvrtc/lib"
     - ls -l "$NVIDIA_LIB"/libnvrtc.so* || true
     - ln -s "$NVIDIA_LIB/libnvrtc.so.12" "$NVIDIA_LIB/libnvrtc.so"
