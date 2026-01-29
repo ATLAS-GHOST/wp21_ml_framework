@@ -10,6 +10,7 @@
     #- cd $PROJECT/project/
     #- python synthesis.py -fin "$PROJECT/hls_$SLOT/model_$SUB/"
     - cd "hls_$SLOT/model_$SUB/"
+    - source /opt/Vitis_HLS/2024.1/settings64.sh
     - vitis_hls build_prj.tcl
     - cd ../../
     - mkdir -p "fw/hls_$SLOT"
