@@ -1,0 +1,20 @@
+# Ignore everything
+*
+
+# Do not ignore directories (needed so we can re-include specific ones)
+!*/
+
+# Whitelist specific files
+!.gitignore
+!setup.py
+!setup.sh
+!config.yml
+!README.md
+!.gitmodules
+
+# Whitelist specific folders
+!ci/
+!wp21_train/
+!project/
+!docker/
+!apptainer/
