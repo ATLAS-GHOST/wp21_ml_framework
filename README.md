@@ -48,7 +48,7 @@ dshell #Launches the container in a dynamic environment (ie. you get a bash term
 
 #Interactive container
 cd /worskpace #Where the code and the sample exists
-myenv #Set's conda environment
+env_name #Set's conda environment (base_env, tf_v2, tf_v3, pytorch, xgboost) supported
 jl #In Apptainer you get an alias with the Jupyter Lab running on the defined port
 
 ##Optional cleanup
@@ -59,6 +59,36 @@ arun --no-gpu
 drun --no-gpu
 
 ```
+
+### Kubeflow support for NGT WP1.1 cluster
+
+New support has been added to include kubeflow integration required for the Next-Generation Trigger cluster. The user should be using the same configuration file and only enable the following option
+
+```
+KUBEFLOW_FILE: "yes"
+
+#This can be done automatically during generation
+```
+
+Including the kubeflow file option will generate a dedicated .yaml file with the following naming convention:
+
+```
+<PROJECT_NAME>_kubeflow.yaml
+```
+
+to utilize this file the following extra aliases will be created within the wp21_ml_framework environment
+
+1. `krun`: Launches the kubeflow session in the cluster machine
+2. `kstatus`: Checks the status of the launched container to see if it's running
+3. `kstop`: Kills the launched container 
+4. `kerror`: Checks in case of errors what the issues were
+
+***NOTE*** Kubeflow support assumes the following:
+
+1. All the required steps to setup access to the NGT WP1.1 cluster have been taken (instructions)[https://ngt.docs.cern.ch/getting-started/]
+2. Source code cannot leave in local machine but rather in eos as this is how it's mounted within WP1.1 resources
+3. Jupyter notebook launching isn't supported yet in the dedicated container
+
 
 ## Container Filesystem
 
@@ -104,7 +134,7 @@ The container creates a fixed environment and detects automatically whether the 
    
    l. `KRB_PASSWORD`: File that contains the password for the automatic /eos authentication (if not provided the kinit will fail and then the user has to copy the file from /eos manually after launching the container)
    
-   m. `KUBEFLOW_FILE`: Currently not supported!
+   m. `KUBEFLOW_FILE`: Generates dedicated KUBEFLOW FILE for the NextGen WP1.1 cluster.
    
    n. `JUPYTER_PORT`: Port in which the Jupyter Notebook within the container will execute.
    
