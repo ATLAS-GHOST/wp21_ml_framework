@@ -82,13 +82,13 @@ to utilize this file the following extra aliases will be created within the wp21
 2. `kstatus`: Checks the status of the launched container to see if it's running
 3. `kstop`: Kills the launched container 
 4. `kerror`: Checks in case of errors what the issues were
+5. `kconnect`: Direct ssh link into the running container
+6. `kforward`: Forwards the JUPYTER_PORT into your local machine
 
 ***NOTE*** Kubeflow support assumes the following:
 
-1. All the required steps to setup access to the NGT WP1.1 cluster have been taken (instructions)[https://ngt.docs.cern.ch/getting-started/]
+1. All the required steps to setup access to the NGT WP1.1 cluster have been taken [instructions](https://ngt.docs.cern.ch/getting-started/)
 2. Source code cannot leave in local machine but rather in eos as this is how it's mounted within WP1.1 resources
-3. Jupyter notebook launching isn't supported yet in the dedicated container
-
 
 ## Container Filesystem
 
