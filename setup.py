@@ -353,20 +353,22 @@ def alias_commands(export_vars):
 
     aclean = 'alias aclean="apptainer cache clean -f"'
 
-    kubestart  = ''
-    kubestop   = '' 
-    kubestatus = ''
-    kubeerror  = ''
-    kubessh    = ''
+    kubestart   = ''
+    kubestop    = '' 
+    kubestatus  = ''
+    kubeerror   = ''
+    kubessh     = ''
+    kubeforward = ''
     if export_vars['exports']['KUBEFLOW_FILE'] == "yes":
-        pod_name   = (export_vars['exports']['ENV_NAME']+'-pod').lower()
-        kubestart  = f'alias krun="kubectl create -f {export_vars["exports"]["ENV_NAME"]}_kubeflow.yaml"'
-        kubestop   = f'alias kstop="kubectl delete po {pod_name}"'
-        kubestatus = f'alias kstatus="kubectl get po"'
-        kubeerror  = f'alias kerror="kubectl logs {pod_name} -c container --previous"' 
-        kubessh    = f'alias kconnect="ssh {pod_name}@ngt.cern.ch"'
+        pod_name    = (export_vars['exports']['ENV_NAME']+'-pod').lower()
+        kubestart   = f'alias krun="kubectl create -f {export_vars["exports"]["ENV_NAME"]}_kubeflow.yaml"'
+        kubestop    = f'alias kstop="kubectl delete po {pod_name}"'
+        kubestatus  = f'alias kstatus="kubectl get po"'
+        kubeerror   = f'alias kerror="kubectl logs {pod_name} -c container --previous"' 
+        kubessh     = f'alias kconnect="ssh {pod_name}@ngt.cern.ch"'
+        kubeforward = f'alias kforward="kubectl port-forward pod/{pod_name} $JUPYTER_PORT:$JUPYTER_PORT"'
 
-    return [drun, dshell, dclean, arun, ashell, abuild, aclean, kubestart, kubestop, kubestatus, kubeerror, kubessh]
+    return [drun, dshell, dclean, arun, ashell, abuild, aclean, kubestart, kubestop, kubestatus, kubeerror, kubessh, kubeforward]
     
 def make_conf_script(export_vars):
     f = open('.run_conf.sh','w')
@@ -438,6 +440,7 @@ def generate_kubeflow(export_vars):
         f"ln -svf {sampleDir} /workspace/samples",
         f"ln -svf {testDir} /workspace/testDir",
         "echo 'source /usr/local/bin/message.sh' >> ~/.bashrc",
+        f'echo \'alias jl="jupyter lab --no-browser --allow-root --ip=0.0.0.0 --port={export_vars["exports"]["JUPYTER_PORT"]}"\' >> ~/.bashrc',
         "exec sleep infinity",
     ])
 
