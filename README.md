@@ -89,6 +89,7 @@ to utilize this file the following extra aliases will be created within the wp21
 
 1. All the required steps to setup access to the NGT WP1.1 cluster have been taken [instructions](https://ngt.docs.cern.ch/getting-started/)
 2. Source code cannot leave in local machine but rather in eos as this is how it's mounted within WP1.1 resources
+3. **Important** Once inside the conda environment please execute: *enable_gpu* which will allow the code to gain GPU access
 
 ## Container Filesystem
 

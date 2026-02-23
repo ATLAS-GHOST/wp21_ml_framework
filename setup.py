@@ -441,9 +441,7 @@ def generate_kubeflow(export_vars):
         f"ln -svf {testDir} /workspace/testDir",
         "echo 'source /usr/local/bin/message.sh' >> ~/.bashrc",
         f'echo \'alias jl="jupyter lab --no-browser --allow-root --ip=0.0.0.0 --port={export_vars["exports"]["JUPYTER_PORT"]}"\' >> ~/.bashrc',
-        f'export NVIDIA_LIB="$CONDA_PREFIX/lib/python3.10/site-packages/nvidia/cuda_nvrtc/lib"',
-        f'ln -sf $NVIDIA_LIB/libnvrtc.so* $NVIDIA_LIB/libnvrtc.so',
-        f'export LD_LIBRARY_PATH="${{CONDA_PREFIX}}/lib/python3.10/site-packages/nvidia/cuda_nvrtc/lib:${{LD_LIBRARY_PATH:-}}"',
+        f'echo \'enable_gpu() {{ export NVIDIA_LIB="$CONDA_PREFIX/lib/python3.10/site-packages/nvidia/cuda_nvrtc/lib"; ln -sf $NVIDIA_LIB/libnvrtc.so* $NVIDIA_LIB/libnvrtc.so; export LD_LIBRARY_PATH=${{CONDA_PREFIX}}/lib/python3.10/site-packages/nvidia/cuda_nvrtc/lib:${{LD_LIBRARY_PATH:-}}; }}\' >> ~/.bashrc',
         "exec sleep infinity",
     ])
 
