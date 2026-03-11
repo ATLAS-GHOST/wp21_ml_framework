@@ -2,18 +2,18 @@
 
 exports:
   ENV_NAME: "jetSeeding" #Name of design
-  CONT_NAME: "hls4ml" #Name of the container
+  CONT_NAME: "train_v2" #Name of the container
   CONT_LOC: "harbor" #Container location [harbor, cvmfs, custom]
-  SAMPLE_PATH: "GlobalSamples/merged/" #Path to samples
-  SAMPLE_NAME: "merged_HHbbbb_10000_train_0.root" #Name of train sample
-  SAMPLE_EOS: "yes" #If sample is in eos
-  PROJECT_FOLDER: "/home/ixiotidi/Development/" #Folder to be copied/access in container
-  PROJECT_NAME: "FastML4Jets" #Name of specific project
-  TEST_FOLDER: "/home/ixiotidi/Development/" #[Optional] Path to test package folder
-  TEST_PACKAGE: "wp21_training_framework" #[Optional] Testing software alogn (wp21_train)
+  SAMPLE_PATH: "$HOME" #Path to samples
+  SAMPLE_NAME: " " #Name of train sample
+  SAMPLE_EOS: "no" #If sample is in eos
+  PROJECT_FOLDER: "$HOME" #Folder to be copied/access in container
+  PROJECT_NAME: " " #Name of specific project
+  TEST_FOLDER: "$HOME" #[Optional] Path to test package folder
+  TEST_PACKAGE: " " #[Optional] Testing software alogn (wp21_train)
   KRB_ACCOUNT: "ngtwp21" #Not in used currently
-  KRB_PASSWORD: "/home/ixiotidi/Development/docker-builder/password.pass" #Password for kerberos ticket
-  KUBEFLOW_FILE: "yes" #Generates or not a kubeflow file for running in NGT WP1.1 cluster
+  KRB_PASSWORD: "" #Password for kerberos ticket
+  KUBEFLOW_FILE: "no" #Generates or not a kubeflow file for running in NGT WP1.1 cluster
   JUPYTER_PORT: 8888 #Jupyter notebook port
   
 metadata:
