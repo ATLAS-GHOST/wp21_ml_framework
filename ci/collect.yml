@@ -19,6 +19,12 @@
     - mkdir -p "${META_PATH%/}/results/hls_$SLOT/fw_$SUB"
     - export IN_PATH="fw/hls_$SLOT/fw_$SUB"
     - export CIN_PATH="fw/hls_$SLOT/fw_$SUB/config_$SUB"
+
+    #MLflow configuration
+    - export MLFLOW_TRACKING_URI=https://ngt.cern.ch/models/
+    - export MLFLOW_EXPERIMENT_NAME=WP21_models
+    - export MLFLOW_RUN_NAME="slot_${SLOT}_sub_${SUB}"
+
     - python $PROJECT/project/collect.py -fin $IN_PATH -conf $CIN_PATH -fout $OUT_PATH
 
 # Pipeline-0
