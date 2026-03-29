@@ -2,7 +2,7 @@
 
 hat-train:
   stage: hat-train
-  extends: .common-train
+  extends: .common-train-v2
   needs:
     - job: setup-stage
       artifacts: true
@@ -13,12 +13,11 @@ hat-train:
     - mkdir -p "$FILE" "$WORK_DIR"
     - ln -s $PROJECT/* $WORK_DIR
     - source ~/.bashrc
-    - myenv
-    #Temporary
-    - pip uninstall -y wp21_train
-    - pip install wp21_train
-    - conda remove -y pytorch-cuda
-    - conda install conda-forge::cudatoolkit
+    - source $PROJECT/project/set_env.sh $PROJECT/project/config_physics.json
+    - export NVIDIA_LIB="$CONDA_PREFIX/lib/python3.10/site-packages/nvidia/cuda_nvrtc/lib"
+    - ls -l "$NVIDIA_LIB"/libnvrtc.so* || true
+    - ln -s "$NVIDIA_LIB/libnvrtc.so.12" "$NVIDIA_LIB/libnvrtc.so"
+    - export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib/python3.10/site-packages/nvidia/cuda_nvrtc/lib:${LD_LIBRARY_PATH:-}"    
     - mkdir out
     - python $PROJECT/project/train_physics.py -fin $PROJECT/project/config_physics -meta "$META_PATH/hat" -fout '' -sample_map $PROJECT/project/sample_mapping.json -sig 'Py8EG_A14NNPDF23LO_Gammatautau_MassWeight' -bg 'Py8EG_A14NNPDF23LO_jj_JZ0' -type 'hat'
   artifacts:

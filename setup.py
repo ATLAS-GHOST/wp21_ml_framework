@@ -15,6 +15,16 @@ print("#####################################")
 
 var = ["ENV_NAME","CONT_NAME","CONT_LOC","SAMPLE_PATH","SAMPLE_NAME","SAMPLE_EOS","PROJECT_FOLDER","PROJECT_NAME","TEST_FOLDER","TEST_PACKAGE","KRB_ACCOUNT","KRB_PASSWORD","KUBEFLOW_FILE","JUPYTER_PORT"]
 
+LD_PATHS = {
+    'train_v2': [
+        '/workspace/Conda/envs/base_env/lib:',
+        '/workspace/Conda/envs/tf_v2/lib:',
+        '/workspace/Conda/envs/tf_v3/lib:',
+        '/workspace/Conda/envs/pytorch/lib:',
+        '/workspace/Conda/evns/xgboost/lib'
+        ],
+}
+
 var_desc = ["Name of the current working environment",
             "Name of the container [hls4ml, conifer, custom]",
             "Container location [harbor, cvmfs, custom]",
@@ -155,13 +165,13 @@ def alias_commands(export_vars):
     DPASSWORD = ''
     APASSWORD = ''
     if export_vars['exports']['KRB_PASSWORD'] != '':
-        #print(f"[INFO] Password file provided from: {export_vars['exports']['KRB_PASSWORD']}")
         log_message("info",f"Password file provided from {export_vars['exports']['KRB_PASSWORD']}")
         DPASSWORD = ' -v $KRB_PASSWORD:/secrets/password.pass:ro'
         APASSWORD = ' --bind $KRB_PASSWORD:/secrets/password.pass:ro'
 
     FILE  = ' -e SAMPLE_PATH=$SAMPLE_PATH -e SAMPLE_NAME=$SAMPLE_NAME'
     AFILE = ' --env SAMPLE_PATH=$SAMPLE_PATH --env SAMPLE_NAME=$SAMPLE_NAME'
+
     if "no" in export_vars['exports']['SAMPLE_EOS']:
         FILE  = ' -v $SAMPLE_PATH$SAMPLE_NAME:/workspace/samples/$SAMPLE_NAME:ro'
         if '/eos' in export_vars['exports']['SAMPLE_PATH']:
@@ -204,7 +214,12 @@ def alias_commands(export_vars):
         AGPU  = " --nv"
         EBIND = " --bind /usr/local/cuda:/usr/local/cuda,/usr/lib:/usr/lib"
         DBIND = " -v /usr/local/cuda:/usr/local/cuda -v /usr/lib:/usr/lib"
-        ALD   = " --env LD_LIBRARY_PATH=/usr/local/cuda/targets/x86_64-linux/lib:/workspace/Conda/envs/myenv/lib"
+        ALD   = " --env LD_LIBRARY_PATH=/usr/local/cuda/targets/x86_64-linux/lib:"
+        if export_vars['exports']['CONT_NAME'] in LD_PATHS:
+            for i_path in LD_PATHS[export_vars['exports']['CONT_NAME']]:
+                ALD += i_path
+        else:
+            ALD += "/workspace/Conda/envs/myenv/lib"
 
     #Docker alias
     #drun   = 'alias drun="'  +dockerBase+' --rm'     + GPU + ' -v '+PROJECT+':/workspace/workDir'+ DPASSWORD + DBIND + DTEST + FILE + ACCOUNT + " -p $JUPYTER_PORT:$JUPYTER_PORT" + CONT + '"'
@@ -225,7 +240,7 @@ def alias_commands(export_vars):
     \tCMD+="{GPU} {DBIND}"\n\
     fi\n\
     \n\
-    CMD+=" -v {PROJECT}:/workspace/workDir {DPASSWORD} {DTEST} {FILE} {ACCOUNT} -p $JUPYTER_PORT:$JUPYTER_PORT {CONT}"\n\
+    CMD+=" -v {PROJECT}:/workspace/workDir {DPASSWORD} {DTEST} {FILE} {ACCOUNT} -e DISPLAY=$DISPLAY -p $JUPYTER_PORT:$JUPYTER_PORT {CONT}"\n\
     CMD+=" ${{ARGS[*]}}"\n\
     \n\
     eval "$CMD"\n\
@@ -328,7 +343,7 @@ def alias_commands(export_vars):
     \tCMD+="{AGPU} {EBIND}"\n\
     fi\n\
     \n\
-    CMD+=" --bind {PROJECT}:/workspace/workDir {APASSWORD} {ATEST} {AFILE} --env JPORT=$JUPYTER_PORT {ALD} {ACONT}"\n\
+    CMD+=" --bind {PROJECT}:/workspace/workDir {APASSWORD} {ATEST} {AFILE} --env JPORT=$JUPYTER_PORT --env DISPLAY=$DISPLAY {ALD} {ACONT}"\n\
     CMD+=" ${{ARGS[*]}}"\n\
     \n\
     eval "$CMD"\n\
@@ -338,7 +353,22 @@ def alias_commands(export_vars):
 
     aclean = 'alias aclean="apptainer cache clean -f"'
 
-    return [drun, dshell, dclean, arun, ashell, abuild, aclean]
+    kubestart   = ''
+    kubestop    = '' 
+    kubestatus  = ''
+    kubeerror   = ''
+    kubessh     = ''
+    kubeforward = ''
+    if export_vars['exports']['KUBEFLOW_FILE'] == "yes":
+        pod_name    = (export_vars['exports']['ENV_NAME']+'-pod').lower()
+        kubestart   = f'alias krun="kubectl create -f {export_vars["exports"]["ENV_NAME"]}_kubeflow.yaml"'
+        kubestop    = f'alias kstop="kubectl delete po {pod_name}"'
+        kubestatus  = f'alias kstatus="kubectl get po"'
+        kubeerror   = f'alias kerror="kubectl logs {pod_name} -c container --previous"' 
+        kubessh     = f'alias kconnect="ssh {pod_name}@ngt.cern.ch"'
+        kubeforward = f'alias kforward="kubectl port-forward pod/{pod_name} $JUPYTER_PORT:$JUPYTER_PORT"'
+
+    return [drun, dshell, dclean, arun, ashell, abuild, aclean, kubestart, kubestop, kubestatus, kubeerror, kubessh, kubeforward]
     
 def make_conf_script(export_vars):
     f = open('.run_conf.sh','w')
@@ -383,6 +413,69 @@ def make_cleanup_script(export_vars):
     f.write('unalias dclean\n')
     f.close()
     
+def generate_kubeflow(export_vars):
+    user       = os.getlogin()
+    user_start = user[0]
+    pod_name   = (export_vars['exports']['ENV_NAME']+'-pod').lower()
+    
+    if 'eos' not in export_vars['exports']['PROJECT_FOLDER']:
+        log_message("error",f"For Kubeflow execution you need to have as your project folder eos as this is where the code will be linked from!")
+    workDir = os.path.join(export_vars['exports']['PROJECT_FOLDER'], export_vars['exports']['PROJECT_NAME'] if export_vars['exports']['PROJECT_NAME'] else '')
+
+    if 'eos' not in export_vars['exports']['SAMPLE_PATH']:
+        log_message("error",f"For Kubeflow execution you need to have as your sample folder eos as this is where the data will be linked from!")
+    sampleDir = os.path.join(export_vars['exports']['SAMPLE_PATH'], export_vars['exports']['SAMPLE_NAME'] if export_vars['exports']['SAMPLE_NAME'] else '') 
+
+    if export_vars['exports']['TEST_FOLDER'] and export_vars['exports']['TEST_PACKAGE']:
+        if 'eos' not in export_vars['exports']['TEST_FOLDER']:
+            log_message("error",f"For Kubeflow execution you need to have as your test package folder eos as this is where the code will be linked from!")
+        testDir = os.path.join(export_vars['exports']['TEST_FOLDER'], export_vars['exports']['TEST_PACKAGE'] if export_vars['exports']['TEST_PACKAGE'] else '')
+    else:
+        testDir = '/'
+
+    args_value = "\n".join([
+        "source /usr/local/bin/entrypoint.sh",
+        "source ~/.bashrc",
+        f"ln -svf {workDir} /workspace/workDir",
+        f"ln -svf {sampleDir} /workspace/samples",
+        f"ln -svf {testDir} /workspace/testDir",
+        "echo 'source /usr/local/bin/message.sh' >> ~/.bashrc",
+        f'echo \'alias jl="jupyter lab --no-browser --allow-root --ip=0.0.0.0 --port={export_vars["exports"]["JUPYTER_PORT"]}"\' >> ~/.bashrc',
+        f'echo \'enable_gpu() {{ export NVIDIA_LIB="$CONDA_PREFIX/lib/python3.10/site-packages/nvidia/cuda_nvrtc/lib"; ln -sf $NVIDIA_LIB/libnvrtc.so* $NVIDIA_LIB/libnvrtc.so; export LD_LIBRARY_PATH=${{CONDA_PREFIX}}/lib/python3.10/site-packages/nvidia/cuda_nvrtc/lib:${{LD_LIBRARY_PATH:-}}; }}\' >> ~/.bashrc',
+        "exec sleep infinity",
+    ])
+
+    config = {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+            "name": f"{pod_name}",
+            "labels": {
+                "mount-eos"  : "true",
+                "mount-afs"  : "false",
+                "mount-cvmfs": "true",
+            },
+        },
+        "spec": {
+            "containers": [
+                {
+                    "name"   : "container",
+                    "image"  : f"registry.cern.ch/atlas-ngt-wp21/{export_vars['exports']['CONT_NAME']}:latest",
+                    "command": ["bash","-lc"],
+                    "args"   : [args_value],
+                    "securityContext": {"runAsUser": 0},
+                    "resources": {"limits": {"nvidia.com/gpu": 1}},
+                }
+            ],
+            "nodeSelector": {"nvidia.com/gpu.product": "NVIDIA-H100-NVL"},
+        },
+    }
+
+    f = open(f'{export_vars["exports"]["ENV_NAME"]}_kubeflow.yaml','w')
+    yaml.safe_dump(config, f, sort_keys=False, default_flow_style=False)
+    f.close()
+    log_message("info",f"Kubeflow configuration written to {export_vars['exports']['ENV_NAME']}_kubeflow.yaml")
+
 def main():
     parser = argparse.ArgumentParser(description="Setup environment for WP2.1 ML framework")
     parser.add_argument("--config", help="Path to YAML config file", required=False)
@@ -414,6 +507,10 @@ def main():
         tvar                   = export_vars
         export_vars            = {}
         export_vars['exports'] = tvar
+
+    if export_vars['exports']['KUBEFLOW_FILE'] == "yes":
+        log_message("info",f"Generating kubeflow file for WP1.1 infrastructure")
+        generate_kubeflow(export_vars)
 
     make_conf_script(export_vars)
     make_cleanup_script(export_vars)

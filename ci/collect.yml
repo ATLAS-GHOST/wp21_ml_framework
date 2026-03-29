@@ -2,7 +2,7 @@
 
 .collect-data:
   stage: collect-data
-  extends: .common-hls
+  extends: .common-hls-v2
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
     - ln -s $EOS_SAMPLES/* $FILE
@@ -11,10 +11,10 @@
     - ln -s fw/hls_$SLOT/fw_$SUB $WORK_DIR
     - ln -s $PROJECT/* $WORK_DIR
     - source ~/.bashrc
-    - myenv
+    - tf_v2
     #Temp. fix
-    - pip uninstall -y wp21_train
-    - pip install wp21_train    
+    #- pip uninstall -y wp21_train
+    #- pip install wp21_train    
     - export OUT_PATH="${META_PATH%/}/results/hls_$SLOT/fw_$SUB/config_$SUB"
     - mkdir -p "${META_PATH%/}/results/hls_$SLOT/fw_$SUB"
     - export IN_PATH="fw/hls_$SLOT/fw_$SUB"

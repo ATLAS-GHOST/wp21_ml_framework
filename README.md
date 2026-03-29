@@ -1,6 +1,6 @@
 # WP21_ML_framework
 
-The current repository is the main repo for developments within the WP2.1 NGT project. The repository aims to provide a common platform for the different tools that are developed so that users don't have to worry about fetching different repositories to get the pipeline to work.
+The current repository is the main repo for developments within the WP2.1 NGT project. The repository aims to provide a common platform for the different tools that are developed so that users don't have to worry about fetching different repositories to get the pipeline to work. In addition the repository is now including the infrastructure to automatically optimize trigger algorithms provided by the user. An example of how to use this infrastructure is provided in the dev. branch and also outlines below.
 
 ## What is currently provided
 
@@ -8,7 +8,8 @@ The current repository is the main repo for developments within the WP2.1 NGT pr
 .
 ├── apptainer
 ├── docker
-└── wp21_train
+├── wp21_train
+└── project
 
 ```
 
@@ -24,7 +25,11 @@ The apptainer-wrapper container provides an interface where users can launch the
 
 This is the python package developed by the WP2.1 team to handle meta-data from the model development. The package can be build and installed via pip-install. The tools is provided via the PyPi interace and already added in the environment.yml within the containers. However if a custom version is needed it can be mounted via the TEST_FOLDER within the container.
 
-## How to use
+4. Project
+
+This is a dummy sub-modules provided by the developers of the NGT WP2.1 pipeline. The use can simply include as a sub-modules their own git repository. The only important thing is to ensure that the sub-modules is added under the folder project
+
+## How to use (standalone)
 
 In order to develop within the WP2.1 framework please use the following instructions:
 
@@ -43,7 +48,7 @@ dshell #Launches the container in a dynamic environment (ie. you get a bash term
 
 #Interactive container
 cd /worskpace #Where the code and the sample exists
-myenv #Set's conda environment
+env_name #Set's conda environment (base_env, tf_v2, tf_v3, pytorch, xgboost) supported
 jl #In Apptainer you get an alias with the Jupyter Lab running on the defined port
 
 ##Optional cleanup
@@ -54,6 +59,37 @@ arun --no-gpu
 drun --no-gpu
 
 ```
+
+### Kubeflow support for NGT WP1.1 cluster
+
+New support has been added to include kubeflow integration required for the Next-Generation Trigger cluster. The user should be using the same configuration file and only enable the following option
+
+```
+KUBEFLOW_FILE: "yes"
+
+#This can be done automatically during generation
+```
+
+Including the kubeflow file option will generate a dedicated .yaml file with the following naming convention:
+
+```
+<PROJECT_NAME>_kubeflow.yaml
+```
+
+to utilize this file the following extra aliases will be created within the wp21_ml_framework environment
+
+1. `krun`: Launches the kubeflow session in the cluster machine
+2. `kstatus`: Checks the status of the launched container to see if it's running
+3. `kstop`: Kills the launched container 
+4. `kerror`: Checks in case of errors what the issues were
+5. `kconnect`: Direct ssh link into the running container
+6. `kforward`: Forwards the JUPYTER_PORT into your local machine
+
+***NOTE*** Kubeflow support assumes the following:
+
+1. All the required steps to setup access to the NGT WP1.1 cluster have been taken [instructions](https://ngt.docs.cern.ch/getting-started/)
+2. Source code cannot leave in local machine but rather in eos as this is how it's mounted within WP1.1 resources
+3. **Important** Once inside the conda environment please execute: *enable_gpu* which will allow the code to gain GPU access
 
 ## Container Filesystem
 
@@ -99,7 +135,7 @@ The container creates a fixed environment and detects automatically whether the 
    
    l. `KRB_PASSWORD`: File that contains the password for the automatic /eos authentication (if not provided the kinit will fail and then the user has to copy the file from /eos manually after launching the container)
    
-   m. `KUBEFLOW_FILE`: Currently not supported!
+   m. `KUBEFLOW_FILE`: Generates dedicated KUBEFLOW FILE for the NextGen WP1.1 cluster.
    
    n. `JUPYTER_PORT`: Port in which the Jupyter Notebook within the container will execute.
    
@@ -123,6 +159,27 @@ abuild --tmp-dir <path-to-tmp-dir> --sif-dir <path-for-sif-file> --cache-dir <pa
 ```
 
 After completing those the .sif file will be generated in the folder indicated by the --sif-file (or $(pwd)). If the .sif file exists in the project folder this sif file is used. If a version of the sif file is present in eos then this version is picked automatically (priority to local).
+
+## How to use the CI infrastructure
+
+The CI infrastructure is aiming to remain independent from the underlying algorithm for this reason the user is discouraged to perform any modifications of how the CI stages are implemented. In order to utilize the existing work please see the below instructions:
+
+1. Request an algorithm specific branch from the repository maintainers
+
+```
+git clone <ml-framework-url>.git
+git checkout -b "my_branch"
+git submodule update --init --recursive
+git submodule add <custom_project_link>.git project/ #Over-writtes the dummy project
+
+```
+
+2. Triggering the CI by pushing to the specific branch
+
+**Note*** The CI is utilizing WP1.1 infrastructure and hence subject to delays when the resources are used. In addition the CI assumes project wide access into the EOS project folder where meta-data can be stored. However the meta-data in EOS aren't backed up and the WP2.1 team will be deleting them every month for a fair share of resources
+
+3. Pipeline currently in dev branch but soon with a few more modifications and optimizations it will migrate to v2.0 of the repository
+
 
 ## Developers
 
