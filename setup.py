@@ -307,7 +307,7 @@ def alias_commands(export_vars):
     \treturn 1 \n\
     fi \n\
     \n\
-    export APPTAINER_CACHEDIR="$cache_dir" \n\    
+    export APPTAINER_CACHEDIR="$cache_dir" \n\
     export APPTAINER_TMPDIR="$tmp_dir" \n\
     \n\
     apptainer build -F --build-arg CONT_NAME=$CONT_NAME "$sif_dir/$CONT_NAME.sif" "$FRAMEWORK_DIR/apptainer/def_file/apptainer.def" \n\
