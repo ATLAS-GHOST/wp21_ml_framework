@@ -1,0 +1,25 @@
+# YML file for BDT training
+
+bdt-train:
+  stage: bdt-train
+  extends: .common-train-v2
+  needs:
+    - job: setup-stage
+      artifacts: true
+  script:
+    - set -euo pipefail
+    - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
+    - mkdir -p "$FILE/samples" "$WORK_DIR"
+    - ln -sfnT "$EOS_SAMPLES" "$FILE/samples/GlobalSamples"
+    - ln -sfnT "$PROJECT/project" "$WORK_DIR/project"
+    - source ~/.bashrc
+    - xgboost
+    - export PYTHONPATH="$PROJECT/wp21_train:${PYTHONPATH:-}"
+    - cd "$PROJECT/project"
+    - chmod +x run_train_physics.sh
+    - ./run_train_physics.sh --bdt
+  artifacts:
+    paths:
+      - project/out/
+#      - project/debug_dataset.pkl
+    expire_in: 2 days

@@ -11,6 +11,7 @@
 !config.yml
 !README.md
 !.gitmodules
+!ci/*.yml
 
 # Whitelist specific folders
 !ci/
