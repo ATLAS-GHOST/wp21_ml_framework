@@ -4,7 +4,7 @@ setup-stage:
   stage: setup-ci
   extends: .common-train-v2
   script:
-    - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" > /dev/null
+    - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH"
     - mkdir -p $META_PATH
     - git submodule set-url project "https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cern.ch/atlas-nextgen-wp21/tau-classifier.git"
     - git submodule set-url wp21_train "https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cern.ch/atlas-nextgen-wp21/wp21_training_framework.git"
