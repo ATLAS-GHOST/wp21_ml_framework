@@ -9,7 +9,7 @@ setup-stage:
     - git submodule set-url project "https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cern.ch/atlas-nextgen-wp21/tau-classifier.git"
     - git submodule set-url wp21_train "https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cern.ch/atlas-nextgen-wp21/wp21_training_framework.git"
     - git submodule sync -- project wp21_train
-    - git config url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cern.ch/".insteadOf "ssh://git@gitlab.cern.ch:7999/"
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cern.ch/".insteadOf "ssh://git@gitlab.cern.ch:7999/"
     - git submodule update --init --recursive --depth 1 project wp21_train
   artifacts:
     paths:
