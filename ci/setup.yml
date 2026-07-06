@@ -14,7 +14,7 @@ setup-stage:
       #    - eos mkdir -p "$META_PATH"
       #    - mkdir -p $META_PATH
     - eos ls -la $META_PATH
-    - touch $META_PATH/test
+    - eos touch ${META_PATH}test
     - git submodule set-url project "https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cern.ch/atlas-nextgen-wp21/tau-classifier.git"
     - git submodule set-url wp21_train "https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cern.ch/atlas-nextgen-wp21/wp21_training_framework.git"
     - git submodule sync -- project wp21_train
