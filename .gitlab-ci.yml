@@ -1,4 +1,4 @@
-stages: [setup-ci, bdt-train]
+stages: [setup-ci, debug, bdt-train]
 
 #Variables to link
 variables:
@@ -24,3 +24,4 @@ include:
   - local: 'ci/_shared.yml'
   - local: 'ci/setup.yml'
   - local: 'ci/bdt.yml'
+  - local: 'ci/debug.yml'

@@ -1,0 +1,10 @@
+# YML for debugging EOS connection issues, etc.
+
+debug:
+  extends: .common-train-v2
+  stage: debug
+  script:
+    - echo "Debug terminal active."
+    - sleep 1800 || true
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /\[ci debug]/
