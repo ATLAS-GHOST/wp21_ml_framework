@@ -6,7 +6,8 @@ variables:
   FILE: "/workspace/samples"
   WORK_DIR: "/workspace/workDir"
   PROJECT: "$CI_PROJECT_DIR" #Change to project folder (as sub-module)
-  META_PATH: "/eos/project/a/atlas-ngt-wp21/meta-data/$GITLAB_USER_LOGIN/$CI_COMMIT_SHA/"
+    #META_PATH: "/eos/project/a/atlas-ngt-wp21/meta-data/$GITLAB_USER_LOGIN/$CI_COMMIT_SHA/"
+  META_PATH: "/eos/project/a/atlas-ngt-wp21/meta-data/$GITLAB_USER_LOGIN/d4b2081ff3aafb29a5b8b20a72f7561a0b66b909/"
     #  META_PATH: "$WORK_DIR/$GITLAB_USER_LOGIN/$CI_COMMIT_SHA/"
   GIT_SUBMODULE_STRATEGY: none
 

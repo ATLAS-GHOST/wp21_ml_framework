@@ -4,14 +4,14 @@ setup-stage:
   stage: setup-ci
   extends: .common-train-v2
   script:
-    - cat /etc/krb5.conf
-    - export KRB5_TRACE=/dev/stderr
+    #    - cat /etc/krb5.conf
+      #    - export KRB5_TRACE=/dev/stderr
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" 
     - klist
     - id
-    - export EOS_MGM_URL=root://eosproject-a.cern.ch
-    - XrdSecDEBUG=1 eos whoami
-    - eos mkdir -p "$META_PATH"
+      #    - export EOS_MGM_URL=root://eosproject-a.cern.ch
+      #    - XrdSecDEBUG=1 eos whoami
+      #    - eos mkdir -p "$META_PATH"
     - mkdir -p $META_PATH
     - git submodule set-url project "https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cern.ch/atlas-nextgen-wp21/tau-classifier.git"
     - git submodule set-url wp21_train "https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cern.ch/atlas-nextgen-wp21/wp21_training_framework.git"
