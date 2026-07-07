@@ -9,6 +9,7 @@ setup-stage:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" 
     - klist
     - id
+    - whoami
       #    - export EOS_MGM_URL=root://eosproject-a.cern.ch
       #    - XrdSecDEBUG=1 eos whoami
       #    - eos mkdir -p "$META_PATH"
