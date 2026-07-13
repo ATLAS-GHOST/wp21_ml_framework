@@ -5,7 +5,7 @@ bdt-train:
   extends: .common-train-v2
   needs:
     - job: setup-stage
-      artifacts: true
+      artifacts: true 
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH"
     - mkdir -p "$FILE/samples" "$WORK_DIR"
