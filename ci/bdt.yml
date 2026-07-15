@@ -8,6 +8,7 @@ bdt-train:
       artifacts: true 
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH"
+    - export KRB5CCNAME=$(klist -e  | egrep -o 'FILE:.*')
     - mkdir -p "$FILE/samples" "$WORK_DIR"
     - ln -sfnT "$EOS_SAMPLES" "$FILE/samples/GlobalSamples"
     - ln -sfnT "$PROJECT/project" "$WORK_DIR/project"
