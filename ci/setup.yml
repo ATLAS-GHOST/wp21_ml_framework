@@ -2,7 +2,7 @@
 
 setup-stage:
   stage: setup-ci
-  extends: .common-train-v2
+  extends: .common-small
   script:
     - echo "$EOS_PASSWORD" | kinit "$EOS_USERNAME@CERN.CH" 
     - export KRB5CCNAME=$(klist -e  | egrep -o 'FILE:.*')
