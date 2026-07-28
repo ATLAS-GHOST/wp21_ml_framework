@@ -8,6 +8,9 @@ variables:
   PROJECT: "$CI_PROJECT_DIR" #Change to project folder (as sub-module)
   META_PATH: "/eos/project/a/atlas-ngt-wp21/meta-data/$GITLAB_USER_LOGIN/$CI_COMMIT_SHA/"
   GIT_SUBMODULE_STRATEGY: none
+  # MLflow credentials must be configured as protected/masked GitLab variables.
+  MLFLOW_ENABLE: "true"
+  # MLFLOW_EXPERIMENT: "Tau1"
 
 #Helper definition
 default:
