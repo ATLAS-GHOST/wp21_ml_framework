@@ -1,0 +1,82 @@
+# YML file for GEP firmware simulation
+
+gep-fw-sim:
+  stage: gep-fw-sim
+  extends: .common-fw-v2
+  needs:
+    - job: bdt-train
+      artifacts: true
+  script:
+    - set -euo pipefail
+    - |
+      if [ -z "${MLFLOW_PACKAGE_URI:-}" ]; then
+        echo "MLFLOW_PACKAGE_URI must be set to the MLflow packaged HLS artifact URI."
+        exit 1
+      fi
+    - |
+      if [ -z "${MLFLOW_TRACKING_TOKEN:-}" ] && { [ -z "${MLFLOW_TRACKING_USERNAME:-}" ] || [ -z "${MLFLOW_TRACKING_PASSWORD:-}" ]; }; then
+        echo "MLflow auth is required: set MLFLOW_TRACKING_TOKEN or MLFLOW_TRACKING_USERNAME and MLFLOW_TRACKING_PASSWORD."
+        exit 1
+      fi
+    - |
+      if [ -z "${SSH_PRIVATE_KEY:-}" ]; then
+        echo "SSH_PRIVATE_KEY must be set as a protected/masked GitLab CI variable for cloning gep-fw."
+        exit 1
+      fi
+    - install -d -m 700 ~/.ssh
+    - |
+      if [ -f "$SSH_PRIVATE_KEY" ]; then
+        cp "$SSH_PRIVATE_KEY" ~/.ssh/id_ed25519
+      else
+        printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+      fi
+    - chmod 600 ~/.ssh/id_ed25519
+    - ssh-keyscan gitlab.cern.ch >> ~/.ssh/known_hosts
+    - ssh-keyscan -p 7999 gitlab.cern.ch >> ~/.ssh/known_hosts
+    - git clone "$GEP_FW_REPOSITORY" gep-fw
+    - cd gep-fw
+    - git checkout -B "$GEP_FW_BRANCH"
+    - git submodule update --init --recursive
+    - python -m pip install -r Software/utils/hls/scripts/requirements.txt mlflow
+    - |
+      if [ -n "$(git status --porcelain -- Top/Algo)" ]; then
+        echo "Top/Algo is not clean before adding the MLflow sandbox:"
+        git status --porcelain -- Top/Algo
+        exit 1
+      fi
+    - |
+      python Software/utils/hls/scripts/add_hls_algo.py \
+        --mlflow \
+        --create \
+        "$MLFLOW_PACKAGE_URI"
+    - |
+      git status --porcelain --untracked-files=all -- Top/Algo \
+        | awk '{print $2}' \
+        | sed -n 's#^\(Top/Algo/[^/]*\).*$#\1#p' \
+        | sort -u > /tmp/gep_hog_projects.txt
+      project_count="$(wc -l < /tmp/gep_hog_projects.txt | tr -d ' ')"
+      if [ "$project_count" -ne 1 ]; then
+        echo "Expected exactly one new Top/Algo project, found $project_count:"
+        git status --porcelain --untracked-files=all -- Top/Algo
+        exit 1
+      fi
+      GEP_HOG_PROJECT="$(sed -n '1s#^Top/##p' /tmp/gep_hog_projects.txt)"
+      export GEP_HOG_PROJECT
+      echo "Running Hog simulation for $GEP_HOG_PROJECT"
+    - ./Hog/Do S "$GEP_HOG_PROJECT" 2>&1 | tee gep-fw-sim.log
+    - |
+      if ! grep -qi "Simulation Successful" gep-fw-sim.log; then
+        echo "Hog simulation log does not contain 'Simulation Successful'."
+        exit 1
+      fi
+      if grep -qi "Reference mismatch" gep-fw-sim.log; then
+        echo "Hog simulation produced reference mismatches."
+        grep -in "Reference mismatch" gep-fw-sim.log || true
+        exit 1
+      fi
+  artifacts:
+    when: always
+    paths:
+      - gep-fw/gep-fw-sim.log
+      - gep-fw/Projects/Algo/*/*.sim/*/behav/xsim/*.log
+    expire_in: 2 days
