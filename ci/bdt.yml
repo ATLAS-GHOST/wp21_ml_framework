@@ -2,7 +2,7 @@
 
 bdt-train:
   stage: bdt-train
-  extends: .common-train-small
+  extends: .common-hls
   needs:
     - job: setup-stage
       artifacts: true 
