@@ -1,0 +1,63 @@
+# YML file for BDT firmware packaging
+
+bdt-fw-build:
+  stage: fw-build
+  extends: .common-fw-v2
+  needs:
+    - job: setup-stage
+      artifacts: true
+    - job: bdt-train
+      artifacts: true
+  script:
+    - set -euo pipefail
+    - |
+      if [ -z "${MLFLOW_TRACKING_TOKEN:-}" ] && { [ -z "${MLFLOW_TRACKING_USERNAME:-}" ] || [ -z "${MLFLOW_TRACKING_PASSWORD:-}" ]; }; then
+        echo "MLflow auth is required: set MLFLOW_TRACKING_TOKEN or MLFLOW_TRACKING_USERNAME and MLFLOW_TRACKING_PASSWORD."
+        exit 1
+      fi
+    - source /opt/Xilinx/Vitis_HLS/2024.1/settings64.sh
+    - python -m pip install mlflow
+    - |
+      export USER="${GITLAB_USER_LOGIN:-${USER:-ci}}"
+      BDT_MLFLOW_EXPERIMENT="$(python - <<'PY'
+      import json
+      import os
+      import sys
+      from pathlib import Path
+
+      sys.path.insert(0, str(Path("project").resolve()))
+      import mlflow_man
+
+      def project_name_from_config(path):
+          config = json.loads(Path(path).read_text(encoding="utf-8"))
+          if isinstance(config, list):
+              for section in config:
+                  meta = section.get("meta") if isinstance(section, dict) else None
+                  if isinstance(meta, dict) and meta.get("project_name"):
+                      return meta["project_name"]
+          if isinstance(config, dict):
+              meta = config.get("meta")
+              if isinstance(meta, dict) and meta.get("project_name"):
+                  return meta["project_name"]
+          raise RuntimeError(f"Could not find meta.project_name in {path}")
+
+      prefix = mlflow_man._name_prefix()
+      experiment_base = os.environ.get("MLFLOW_EXPERIMENT") or project_name_from_config("project/config_physics_bdt.json")
+      print(mlflow_man._prefixed_name(experiment_base, prefix))
+      PY
+      )"
+      export BDT_MLFLOW_EXPERIMENT
+      echo "Using MLflow experiment: $BDT_MLFLOW_EXPERIMENT"
+    - cd "$PROJECT/project"
+    - |
+      python package_bdt.py \
+        --package-config package_config.json \
+        --mlflow-experiment "$BDT_MLFLOW_EXPERIMENT" \
+        --dotenv-output "$CI_PROJECT_DIR/mlflow_package.env" \
+        out
+  artifacts:
+    reports:
+      dotenv: mlflow_package.env
+    paths:
+      - project/out/packaged/
+    expire_in: 2 days

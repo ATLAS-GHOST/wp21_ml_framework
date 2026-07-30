@@ -4,7 +4,7 @@ gep-fw-sim:
   stage: gep-fw-sim
   extends: .common-fw-v2
   needs:
-    - job: bdt-train
+    - job: bdt-fw-build
       artifacts: true
   script:
     - set -euo pipefail

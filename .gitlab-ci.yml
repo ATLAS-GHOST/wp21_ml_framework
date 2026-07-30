@@ -1,4 +1,4 @@
-stages: [setup-ci, bdt-train, gep-fw-sim]
+stages: [setup-ci, bdt-train, fw-build, gep-fw-sim]
 
 #Variables to link
 variables:
@@ -15,7 +15,6 @@ variables:
   # be configured as protected/masked GitLab variables.
   GEP_FW_REPOSITORY: "ssh://git@gitlab.cern.ch:7999/atlas-tdaq-p2-firmware/global-trigger/gep-fw.git"
   GEP_FW_BRANCH: "ci/test_ml"
-  MLFLOW_PACKAGE_URI: ""
 
 #Helper definition
 default:
@@ -31,4 +30,5 @@ include:
   - local: 'ci/_shared.yml'
   - local: 'ci/setup.yml'
   - local: 'ci/bdt.yml'
+  - local: 'ci/bdt_fw.yml'
   - local: 'ci/gep_fw.yml'
