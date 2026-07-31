@@ -49,6 +49,7 @@ bdt-fw-build:
       export BDT_MLFLOW_EXPERIMENT
       echo "Using MLflow experiment: $BDT_MLFLOW_EXPERIMENT"
     - cd "$PROJECT/project"
+    - chmod -R u+rwX out
     - |
       python package_bdt.py \
         --package-config package_config.json \
