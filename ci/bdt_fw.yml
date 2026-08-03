@@ -49,16 +49,21 @@ bdt-fw-build:
       export BDT_MLFLOW_EXPERIMENT
       echo "Using MLflow experiment: $BDT_MLFLOW_EXPERIMENT"
     - cd "$PROJECT/project"
-    - chmod -R u+rwX out
+    - |
+      export BDT_FW_OUT="$CI_PROJECT_DIR/bdt_fw_out"
+      rm -rf "$BDT_FW_OUT"
+      mkdir -p "$BDT_FW_OUT"
+      cp -R --no-preserve=mode,ownership out/. "$BDT_FW_OUT/"
+      chmod -R u+rwX "$BDT_FW_OUT"
     - |
       python package_bdt.py \
         --package-config package_config.json \
         --mlflow-experiment "$BDT_MLFLOW_EXPERIMENT" \
         --dotenv-output "$CI_PROJECT_DIR/mlflow_package.env" \
-        out
+        "$BDT_FW_OUT"
   artifacts:
     reports:
       dotenv: mlflow_package.env
     paths:
-      - project/out/packaged/
+      - bdt_fw_out/packaged/
     expire_in: 2 days
