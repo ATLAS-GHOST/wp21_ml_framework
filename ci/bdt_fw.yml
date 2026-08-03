@@ -1,5 +1,5 @@
 # YML file for BDT firmware packaging
-
+ 
 bdt-fw-build:
   stage: fw-build
   extends: .common-fw-v2
