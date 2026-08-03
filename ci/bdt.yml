@@ -14,7 +14,21 @@ bdt-train:
     - ln -sfnT "$PROJECT/project" "$WORK_DIR/project"
     - source ~/.bashrc
     - xgboost
-    - export PYTHONPATH="$PROJECT/wp21_train:${PYTHONPATH:-}"
+    - |
+      export CONIFER_SOURCE="$PROJECT/project/conifer"
+      if [ ! -d "$CONIFER_SOURCE/conifer" ]; then
+        echo "Expected conifer checkout at $CONIFER_SOURCE, but it was not found."
+        exit 1
+      fi
+      export PYTHONPATH="$CONIFER_SOURCE:$PROJECT/wp21_train:${PYTHONPATH:-}"
+      python - <<'PY'
+      import importlib.util
+
+      spec = importlib.util.find_spec("conifer")
+      if spec is None:
+          raise SystemExit("Could not resolve conifer on PYTHONPATH")
+      print(f"Using conifer from: {spec.origin}")
+      PY
     - cd "$PROJECT/project"
     - chmod +x run_train_physics.sh
     - ./run_train_physics.sh --bdt

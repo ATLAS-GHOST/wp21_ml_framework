@@ -50,6 +50,21 @@ bdt-fw-build:
       echo "Using MLflow experiment: $BDT_MLFLOW_EXPERIMENT"
     - cd "$PROJECT/project"
     - |
+      export CONIFER_SOURCE="$PROJECT/project/conifer"
+      if [ ! -d "$CONIFER_SOURCE/conifer" ]; then
+        echo "Expected conifer checkout at $CONIFER_SOURCE, but it was not found."
+        exit 1
+      fi
+      export PYTHONPATH="$CONIFER_SOURCE:${PYTHONPATH:-}"
+      python - <<'PY'
+      import importlib.util
+
+      spec = importlib.util.find_spec("conifer")
+      if spec is None:
+          raise SystemExit("Could not resolve conifer on PYTHONPATH")
+      print(f"Using conifer from: {spec.origin}")
+      PY
+    - |
       export BDT_FW_OUT="$CI_PROJECT_DIR/bdt_fw_out"
       rm -rf "$BDT_FW_OUT"
       mkdir -p "$BDT_FW_OUT"
