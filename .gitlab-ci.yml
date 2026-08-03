@@ -11,8 +11,8 @@ variables:
   # MLflow credentials must be configured as protected/masked GitLab variables.
   MLFLOW_ENABLE: "true"
   # MLFLOW_EXPERIMENT: "Tau1"
-  # GEP firmware simulation inputs. MLflow credentials must be configured as
-  # protected/masked GitLab variables.
+  # GEP firmware simulation inputs. SSH_PRIVATE_KEY is used for gep-fw SSH clone;
+  # MLflow credentials must be configured as protected/masked GitLab variables.
   GEP_FW_REPOSITORY: "ssh://git@gitlab.cern.ch:7999/atlas-tdaq-p2-firmware/global-trigger/gep-fw.git"
   GEP_FW_BRANCH: "ci/test_ml"
 

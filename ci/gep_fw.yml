@@ -19,11 +19,22 @@ gep-fw-sim:
         exit 1
       fi
     - |
-      if [ -z "${CI_JOB_TOKEN:-}" ]; then
-        echo "CI_JOB_TOKEN must be available for cloning gep-fw."
+      if [ -n "${SSH_PRIVATE_KEY:-}" ]; then
+        echo "Using SSH_PRIVATE_KEY for cloning gep-fw."
+        install -d -m 700 ~/.ssh
+        if [ -f "$SSH_PRIVATE_KEY" ]; then
+          cp "$SSH_PRIVATE_KEY" ~/.ssh/id_ed25519
+        else
+          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+        fi
+        chmod 600 ~/.ssh/id_ed25519
+        ssh-keyscan gitlab.cern.ch >> ~/.ssh/known_hosts
+        ssh-keyscan -p 7999 gitlab.cern.ch >> ~/.ssh/known_hosts
+        export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes"
+      else
+        echo "SSH_PRIVATE_KEY must be available for cloning gep-fw."
         exit 1
       fi
-    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cern.ch/".insteadOf "ssh://git@gitlab.cern.ch:7999/"
     - git clone "$GEP_FW_REPOSITORY" gep-fw
     - cd gep-fw
     - git checkout -B "$GEP_FW_BRANCH"
