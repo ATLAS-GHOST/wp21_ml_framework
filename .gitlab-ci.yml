@@ -26,7 +26,7 @@ default:
     - base() { conda activate base; }
     
 #Stage file inclusion
-include:
+include: 
   - local: 'ci/_shared.yml'
   - local: 'ci/setup.yml'
   - local: 'ci/bdt.yml'
