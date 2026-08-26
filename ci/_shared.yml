@@ -20,7 +20,8 @@
 
 .common-train-v2:
   image: registry.cern.ch/atlas-ngt-wp21/train_v2
-  tags: [cern-nextgen-h100-12GB]
+    #  tags: [cern-nextgen-h100-12GB]
+  tags: [cern-nextgen-cpu]
 
 .common-hls-v2:
   image: registry.cern.ch/atlas-ngt-wp21/train_v2
