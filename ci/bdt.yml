@@ -30,7 +30,7 @@ bdt-train:
       print(f"Using conifer from: {spec.origin}")
       PY
     - cd "$PROJECT/project"
-    - chmod +x run_train_physics.sh
+    - chmod +x run_train_physics.sh 
     - ./run_train_physics.sh --bdt
   artifacts:
     paths:
